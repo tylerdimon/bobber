@@ -31,3 +31,14 @@ Download from [GitHub]()
 First create a namespace. If it helps you can think of each namespace as a different API to be mocked out. This helps avoid conflicts with common endpoints like `/users` or `/token`.
 
 Each name space will get a slug, for example `really-cool-api`. A namespace with that slug will expect requests at `/requests/really-cool-api/`.
+
+## Testing
+
+This project includes both Javascript and Go tests.
+
+### Javascript
+
+```
+npm ci
+npm test
+```

@@ -20,7 +20,7 @@ function addRequestToList(message) {
     list.insertBefore(li, list.firstChild);
 }
 
-document.getElementById("clearRequests").addEventListener("click", function() {
+function clearRequests() {
     // Clear the list in the frontend
     document.getElementById("requestList").innerHTML = '';
 
@@ -33,16 +33,6 @@ document.getElementById("clearRequests").addEventListener("click", function() {
             console.log('All requests cleared');
         })
         .catch(error => console.error('Error:', error));
-});
+}
 
-var ws = new WebSocket("ws://localhost:8000/ws");
-
-ws.onmessage = function(event) {
-    addRequestToList(event.data);
-};
-
-ws.onopen = function(event) {
-    ws.send("Connected");
-};
-
-document.addEventListener('DOMContentLoaded', fetchInitialData);
+module.exports = { addRequestToList, fetchInitialData, clearRequests };

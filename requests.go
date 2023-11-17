@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"go.etcd.io/bbolt"
 	"net/http"
 	"time"
@@ -93,7 +94,7 @@ func SaveRequest(data RequestData) error {
 
 	err = db.Update(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte("Requests"))
-		return b.Put([]byte(data.Timestamp), jsonData)
+		return b.Put([]byte(uuid.New().String()), jsonData)
 	})
 	return err
 }

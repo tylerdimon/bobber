@@ -3,6 +3,7 @@
 <head>
     <title>Bobber</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="script.js"></script>
 </head>
 <body>
     <header>
@@ -20,4 +21,18 @@
     </footer>
 </body>
 </html>
-<script src="script.js"></script>
+<script>
+    document.getElementById("clearRequests").addEventListener("click", clearRequests);
+
+    var ws = new WebSocket("ws://localhost:8000/ws");
+
+    ws.onmessage = function(event) {
+        addRequestToList(event.data);
+    };
+
+    ws.onopen = function(event) {
+        ws.send("Connected");
+    };
+
+    document.addEventListener('DOMContentLoaded', fetchInitialData);
+</script>
