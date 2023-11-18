@@ -15,16 +15,14 @@ function addRequestToList(message) {
     li.innerHTML = message.split('\n').map(function(detail) {
         return '<span>' + detail.split(': ')[0] + ':</span> ' + detail.split(': ').slice(1).join(': ');
     }).join('<br>');
+
     var list = document.getElementById("requestList");
-    // Insert the new element at the beginning of the list
     list.insertBefore(li, list.firstChild);
 }
 
 function clearRequests() {
-    // Clear the list in the frontend
     document.getElementById("requestList").innerHTML = '';
 
-    // Send a request to the backend to clear BoltDB
     fetch('/api/requests/delete', { method: 'POST' })
         .then(response => {
             if (!response.ok) {
@@ -35,4 +33,5 @@ function clearRequests() {
         .catch(error => console.error('Error:', error));
 }
 
+// exported for testability
 module.exports = { addRequestToList, fetchInitialData, clearRequests };
