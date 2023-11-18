@@ -1,3 +1,3 @@
-bobber.exe
-requestLogs.db
+*.exe
+*.sqlite*
 node_modules
