@@ -3,6 +3,7 @@ package main
 import (
 	http2 "github.com/tylerdimon/bobber/http"
 	"github.com/tylerdimon/bobber/sqlite"
+	"github.com/tylerdimon/bobber/ws"
 	"log"
 	"net/http"
 )
@@ -19,10 +20,19 @@ func main() {
 	requestService := &sqlite.RequestService{}
 	requestService.DB = db
 
+	websocketService := ws.WebsocketService{}
+	websocketService.Init()
+	go websocketService.HandleMessages()
+
 	requestHandler := &http2.RequestHandler{}
 	requestHandler.Service = requestService
+	requestHandler.WebsocketService = &websocketService
 
-	http2.WebsocketRun()
+	websocketHandler := http2.WebsocketHandler{}
+	websocketHandler.WebsocketService = &websocketService
+
+	// WebSockets
+	http.HandleFunc("/ws", websocketHandler.HandleConnections)
 
 	// API
 	http.HandleFunc("/api/requests/delete", requestHandler.DeleteAllRequestsHandler)

@@ -1,52 +1,29 @@
 package http
 
 import (
-	"github.com/gorilla/websocket"
+	"github.com/tylerdimon/bobber/ws"
 	"log"
 	"net/http"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool { return true },
+type WebsocketHandler struct {
+	WebsocketService *ws.WebsocketService
 }
 
-var clients = make(map[*websocket.Conn]bool)
-var Broadcast = make(chan string)
-
-func handleMessages() {
-	for {
-		msg := <-Broadcast
-		log.Printf("Received a websocket message: %v", msg)
-		for client := range clients {
-			err := client.WriteMessage(websocket.TextMessage, []byte(msg))
-			if err != nil {
-				log.Printf("error: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
-	}
-}
-
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	ws, err := upgrader.Upgrade(w, r, nil)
+func (h WebsocketHandler) HandleConnections(w http.ResponseWriter, r *http.Request) {
+	socket, err := ws.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer ws.Close()
+	defer socket.Close()
 
-	clients[ws] = true
+	h.WebsocketService.AddClient(socket)
 
 	for {
-		_, _, err := ws.ReadMessage()
+		_, _, err := socket.ReadMessage()
 		if err != nil {
-			delete(clients, ws)
+			h.WebsocketService.DeleteClient(socket)
 			break
 		}
 	}
-}
-
-func WebsocketRun() {
-	go handleMessages()
-	http.HandleFunc("/ws", handleConnections)
 }

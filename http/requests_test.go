@@ -9,16 +9,19 @@ import (
 )
 
 func TestAddRequestHandler(t *testing.T) {
-	// TODO Broadcast should probably be accessed through RequestHandler or RequestService?
-	// definitely not globally
+	mockService := new(mock.RequestService)
+	websocketService := new(mock.WebsocketService)
+	websocketService.Init()
+	handler := RequestHandler{
+		Service:          mockService,
+		WebsocketService: websocketService,
+	}
+
 	// consume channel to prevent blocking
 	go func() {
-		for range Broadcast {
+		for range websocketService.Broadcast() {
 		}
 	}()
-
-	mockService := new(mock.RequestService)
-	handler := RequestHandler{Service: mockService}
 
 	requestBody := bytes.NewBufferString(`{"method":"GET","url":"http://example.com"}`)
 

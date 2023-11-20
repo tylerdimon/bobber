@@ -12,7 +12,8 @@ import (
 )
 
 type RequestHandler struct {
-	Service bobber.RequestService
+	Service          bobber.RequestService
+	WebsocketService bobber.WebsocketService
 }
 
 func (h *RequestHandler) AddRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +45,7 @@ func (h *RequestHandler) AddRequestHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	Broadcast <- request.String()
+	h.WebsocketService.Broadcast() <- request.String()
 
 	w.Write([]byte("Request received"))
 }
