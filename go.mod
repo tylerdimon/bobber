@@ -3,6 +3,7 @@ module github.com/tylerdimon/bobber
 go 1.21
 
 require (
+	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.1
 	github.com/jmoiron/sqlx v1.3.5
 	modernc.org/sqlite v1.27.0

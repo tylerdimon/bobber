@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
 	"io"
 	"log"
@@ -14,6 +15,12 @@ import (
 type RequestHandler struct {
 	Service          bobber.RequestService
 	WebsocketService bobber.WebsocketService
+}
+
+func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
+	r.HandleFunc("/api/requests/delete", h.DeleteAllRequestsHandler)
+	r.HandleFunc("/api/requests/all", h.GetAllRequests)
+	r.PathPrefix("/requests/").HandlerFunc(h.AddRequestHandler)
 }
 
 func (h *RequestHandler) AddRequestHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,11 +1,10 @@
 package main
 
 import (
-	http2 "github.com/tylerdimon/bobber/http"
+	"github.com/tylerdimon/bobber/http"
 	"github.com/tylerdimon/bobber/sqlite"
 	"github.com/tylerdimon/bobber/ws"
 	"log"
-	"net/http"
 )
 
 func main() {
@@ -20,33 +19,15 @@ func main() {
 	requestService := &sqlite.RequestService{}
 	requestService.DB = db
 
-	websocketService := ws.WebsocketService{}
+	websocketService := &ws.WebsocketService{}
 	websocketService.Init()
 	go websocketService.HandleMessages()
 
-	requestHandler := &http2.RequestHandler{}
-	requestHandler.Service = requestService
-	requestHandler.WebsocketService = &websocketService
-
-	websocketHandler := http2.WebsocketHandler{}
-	websocketHandler.WebsocketService = &websocketService
-
-	// WebSockets
-	http.HandleFunc("/ws", websocketHandler.HandleConnections)
-
-	// API
-	http.HandleFunc("/api/requests/delete", requestHandler.DeleteAllRequestsHandler)
-	http.HandleFunc("/api/requests/all", requestHandler.GetAllRequests)
-
-	// UI
-	http.HandleFunc("/requests/", requestHandler.AddRequestHandler)
-
-	// Static file server
-	fs := http.FileServer(http.Dir("static"))
-	http.Handle("/", fs)
-
-	log.Println("Listening on :8000...")
-	err := http.ListenAndServe(":8000", nil)
+	server := &http.Server{}
+	server.WebsocketService = websocketService
+	server.RequestService = requestService
+	server.Init()
+	err := server.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

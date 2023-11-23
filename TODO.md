@@ -1,4 +1,9 @@
 ### TODO
+- refactor http package out of main.go
+- add go tests
+- embded assets?
+
+
  - add namespaces
    - part of path following `/requests/` before the `next` will map to a namespace
  - add endpoints

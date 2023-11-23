@@ -1,16 +1,23 @@
 package http
 
 import (
+	"github.com/gorilla/mux"
+	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/ws"
 	"log"
 	"net/http"
 )
 
 type WebsocketHandler struct {
-	WebsocketService *ws.WebsocketService
+	WebsocketService bobber.WebsocketService
 }
 
-func (h WebsocketHandler) HandleConnections(w http.ResponseWriter, r *http.Request) {
+func (h *WebsocketHandler) RegisterWebsocketRoutes(r *mux.Router) {
+	r.HandleFunc("/ws", h.HandleConnections)
+
+}
+
+func (h *WebsocketHandler) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	socket, err := ws.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
