@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
+	"github.com/tylerdimon/bobber/static"
 	"log"
 	"net/http"
 )
@@ -28,9 +29,18 @@ func (s *Server) Init() {
 	//s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
 
 	// Handle embedded asset serving. This serves files embedded from http/assets.
-	//s.router.PathPrefix("/assets/").
-	//	Handler(http.StripPrefix("/assets/", hashfs.FileServer(assets.FS)))
-	s.serveStaticFiles()
+	//s.router.PathPrefix("/static/").
+	//	Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
+
+	s.router.PathPrefix("/static/").
+		Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
+
+	static.ParseHTML()
+	s.router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if err := static.IndexTemplate.Execute(w, nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 
 	requestHandler := &RequestHandler{}
 	requestHandler.Service = s.RequestService

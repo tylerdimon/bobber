@@ -1,3 +1,4 @@
 *.exe
 *.sqlite*
 node_modules
+.idea

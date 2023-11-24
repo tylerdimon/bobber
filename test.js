@@ -1,4 +1,4 @@
-const {addRequestToList, fetchInitialData, clearRequests} = require('./static/script');
+const {addRequestToList, fetchInitialData, clearRequests} = require('./static/assets/script');
 
 test('addRequestToList adds a new item to the list', () => {
     document.body.innerHTML = '<ul id="requestList"></ul>';

@@ -3,6 +3,8 @@ package mock
 import "github.com/tylerdimon/bobber"
 
 type RequestService struct {
+	Requests []bobber.Request
+
 	GetByIDCalled    int
 	GetAllCalled     int
 	AddCalled        int
@@ -13,6 +15,7 @@ type RequestService struct {
 
 func (m *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	m.AddCalled = m.AddCalled + 1
+	m.Requests = append(m.Requests, request)
 	return nil, nil
 }
 
@@ -23,7 +26,7 @@ func (m *RequestService) GetByID(id string) (bobber.Request, error) {
 
 func (m *RequestService) GetAll() ([]bobber.Request, error) {
 	m.GetAllCalled = m.GetAllCalled + 1
-	return nil, nil
+	return m.Requests, nil
 }
 
 func (m *RequestService) Update(request bobber.Request) (bobber.Request, error) {

@@ -20,10 +20,10 @@ type RequestHandler struct {
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
 	r.HandleFunc("/api/requests/delete", h.DeleteAllRequestsHandler)
 	r.HandleFunc("/api/requests/all", h.GetAllRequests)
-	r.PathPrefix("/requests/").HandlerFunc(h.AddRequestHandler)
+	r.PathPrefix("/requests/").HandlerFunc(h.RecordRequestHandler)
 }
 
-func (h *RequestHandler) AddRequestHandler(w http.ResponseWriter, r *http.Request) {
+func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("error reading request body: %v", err)
