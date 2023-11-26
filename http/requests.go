@@ -54,7 +54,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	h.WebsocketService.Broadcast() <- request.String()
+	h.WebsocketService.Broadcast() <- &request
 
 	w.Write([]byte("Request received"))
 }

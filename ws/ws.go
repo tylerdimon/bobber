@@ -3,6 +3,7 @@ package ws
 import (
 	"github.com/gorilla/websocket"
 	"github.com/tylerdimon/bobber"
+	"github.com/tylerdimon/bobber/static"
 	"log"
 	"net/http"
 )
@@ -13,20 +14,26 @@ var Upgrader = websocket.Upgrader{
 
 type WebsocketService struct {
 	clients   map[bobber.Client]bool
-	broadcast chan string
+	broadcast chan *bobber.Request
 }
 
 func (s *WebsocketService) Init() {
 	s.clients = make(map[bobber.Client]bool)
-	s.broadcast = make(chan string)
+	s.broadcast = make(chan *bobber.Request)
 }
 
 func (s *WebsocketService) HandleMessages() {
 	for {
-		msg := <-s.broadcast
-		log.Printf("Received a websocket message: %v", msg)
+		request := <-s.broadcast
+		log.Printf("Received a websocket message: %v", request.String())
+		msg, err := static.GetRequestHTML(request)
+		if err != nil {
+			log.Printf("error getting requst HTML to send over websocket: %v", err)
+			return
+		}
+
 		for client := range s.clients {
-			err := client.WriteMessage(websocket.TextMessage, []byte(msg))
+			err := client.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
 				log.Printf("error: %v", err)
 				client.Close()
@@ -36,7 +43,7 @@ func (s *WebsocketService) HandleMessages() {
 	}
 }
 
-func (s *WebsocketService) Broadcast() chan string {
+func (s *WebsocketService) Broadcast() chan *bobber.Request {
 	return s.broadcast
 }
 

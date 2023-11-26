@@ -5,15 +5,7 @@
 </div>
 <ul id="requestList">
     {{range .Data}}
-    <li class="request-detail">
-        <span>Method: {{.Method}}</span><br>
-        <span>URL: {{.URL}}</span><br>
-        <span>Host: {{.Host}}</span><br>
-        <span>Path: {{.Path}}</span><br>
-        <span>Timestamp: {{.Timestamp}}</span><br>
-        <span>Body: {{.Body}}</span><br>
-        <span>Headers: {{.Headers}}</span>
-    </li>
+        {{template "request" .}}
     {{end}}
 </ul>
 {{end}}
