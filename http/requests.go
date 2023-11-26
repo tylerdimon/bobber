@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
+	"github.com/tylerdimon/bobber/static"
 	"io"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
 	r.HandleFunc("/api/requests/delete", h.DeleteAllRequestsHandler)
 	r.HandleFunc("/api/requests/all", h.GetAllRequests)
 	r.PathPrefix("/requests/").HandlerFunc(h.RecordRequestHandler)
+	r.HandleFunc("/", h.RequestIndexHandler)
 }
 
 func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,6 +79,27 @@ func (h *RequestHandler) GetAllRequests(w http.ResponseWriter, r *http.Request) 
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
+}
+
+func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Request) {
+	requests, err := h.Service.GetAll()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	pageData := struct {
+		Title string
+		Data  any
+	}{
+		Title: "Requests",
+		Data:  requests,
+	}
+
+	err = static.IndexTemplate.Execute(w, pageData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *RequestHandler) DeleteAllRequestsHandler(w http.ResponseWriter, r *http.Request) {

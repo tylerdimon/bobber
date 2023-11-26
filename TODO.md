@@ -1,7 +1,7 @@
 ### TODO
-- refactor http package out of main.go
+- HTML for requests is in two places, websocket message should just send HTML 
+rendered by Go to keep it in same place?
 - add go tests
-- embded assets?
 
 
  - add namespaces

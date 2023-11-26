@@ -28,19 +28,10 @@ func (s *Server) Init() {
 	// Setup error handling routes.
 	//s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
 
-	// Handle embedded asset serving. This serves files embedded from http/assets.
-	//s.router.PathPrefix("/static/").
-	//	Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
-
 	s.router.PathPrefix("/static/").
 		Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
 
 	static.ParseHTML()
-	s.router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if err := static.IndexTemplate.Execute(w, nil); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
 
 	requestHandler := &RequestHandler{}
 	requestHandler.Service = s.RequestService
@@ -56,13 +47,4 @@ func (s *Server) Run() error {
 	log.Println("Listening on :8000...")
 	s.server.Addr = ":8000"
 	return s.server.ListenAndServe()
-}
-
-func (s *Server) serveStaticFiles() {
-
-	// Handle embedded asset serving. This serves files embedded from http/assets.
-	//s.router.PathPrefix("/assets/").
-	//	Handler(http.StripPrefix("/assets/", hashfs.FileServer(assets.FS)))
-	fs := http.FileServer(http.Dir("static"))
-	s.router.Handle("/", fs)
 }

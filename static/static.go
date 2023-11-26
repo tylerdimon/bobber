@@ -2,8 +2,10 @@ package static
 
 import (
 	"embed"
+	"github.com/tylerdimon/bobber"
 	"html/template"
 	"log"
+	"os"
 )
 
 //go:embed assets
@@ -20,4 +22,21 @@ func ParseHTML() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+type PageData struct {
+	Title string
+	Data  any
+}
+
+func ExecIndexTemplate(data []bobber.Request) error {
+	pageData := PageData{
+		Title: "Requests",
+		Data:  data,
+	}
+	err := IndexTemplate.Execute(os.Stdout, pageData)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }
