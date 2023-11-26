@@ -1,7 +1,8 @@
 ### TODO
 - HTML for requests is in two places, websocket message should just send HTML 
 rendered by Go to keep it in same place?
-- add go tests
+- finish go tests
+- set up .env and move things to it
 
 
  - add namespaces

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bobber | {{.Title}}</title>
+    <link rel="stylesheet" type="text/css" href="static/assets/styles.css">
+    <script src="./static/assets/script.js"></script>
+</head>
+<body>
+<header>
+    <h1>Bobber</h1>
+</header>
+
+{{template "content" .}}
+
+<footer>
+    <p>made by tylerdimon.com</p>
+</footer>
+</body>
+</html>
+<script>
+    document.getElementById("clearRequests").addEventListener("click", clearRequests);
+
+    var ws = new WebSocket("ws://localhost:8000/ws");
+
+    ws.onmessage = function(event) {
+        addRequestToList(event.data);
+    };
+
+    ws.onopen = function(event) {
+        ws.send("Connected");
+    };
+</script>

@@ -1,55 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bobber | {{.Title}}</title>
-    <link rel="stylesheet" type="text/css" href="static/assets/styles.css">
-    <script src="./static/assets/script.js"></script>
-</head>
-<body>
-    <header>
-        <h1>Bobber</h1>
-    </header>
-
-    <div class="requests-header">
-        <h2>Requests</h2>
-        <button id="clearRequests">Clear All Requests</button>
-    </div>
-    <ul id="requestList">
-        {{range .Data}}
-        <li class="request-detail">
-            <span>Method: {{.Method}}</span><br>
-            <span>URL: {{.URL}}</span><br>
-            <span>Host: {{.Host}}</span><br>
-            <span>Path: {{.Path}}</span><br>
-            <span>Timestamp: {{.Timestamp}}</span><br>
-            <span>Body: {{.Body}}</span><br>
-            <span>Headers: {{.Headers}}</span>
-        </li>
-        {{end}}
-    </ul>
-    <footer>
-        <p>made by tylerdimon.com</p>
-    </footer>
-</body>
-</html>
-<script>
-    document.getElementById("clearRequests").addEventListener("click", clearRequests);
-
-    var ws = new WebSocket("ws://localhost:8000/ws");
-
-    ws.onmessage = function(event) {
-        addRequestToList(event.data);
-    };
-
-    ws.onopen = function(event) {
-        ws.send("Connected");
-    };
-
-    // document.addEventListener('DOMContentLoaded', fetchInitialData);
-
-    // var li = document.createElement("li");
-    // li.className = 'request-detail';
-    // li.innerHTML = message.split('\n').map(function(detail) {
-    //     return '<span>' + detail.split(': ')[0] + ':</span> ' + detail.split(': ').slice(1).join(': ');
-    // }).join('<br>');
-</script>
+{{define "content"}}
+<div class="requests-header">
+    <h2>Requests</h2>
+    <button id="clearRequests">Clear All Requests</button>
+</div>
+<ul id="requestList">
+    {{range .Data}}
+    <li class="request-detail">
+        <span>Method: {{.Method}}</span><br>
+        <span>URL: {{.URL}}</span><br>
+        <span>Host: {{.Host}}</span><br>
+        <span>Path: {{.Path}}</span><br>
+        <span>Timestamp: {{.Timestamp}}</span><br>
+        <span>Body: {{.Body}}</span><br>
+        <span>Headers: {{.Headers}}</span>
+    </li>
+    {{end}}
+</ul>
+{{end}}
