@@ -11,14 +11,15 @@ import (
 //go:embed assets
 var Assets embed.FS
 
-////go:embed html/index.html
-//var index embed.FS
+//go:embed html*
+var html embed.FS
 
 var IndexTemplate *template.Template
 
 func ParseHTML() {
 	var err error
-	IndexTemplate, err = template.ParseFiles("static/html/base.html", "static/html/index.html")
+
+	IndexTemplate, err = template.ParseFS(html, "html/base.html", "html/index.html")
 	if err != nil {
 		log.Fatal(err)
 	}

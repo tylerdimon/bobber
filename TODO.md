@@ -3,6 +3,8 @@
 rendered by Go to keep it in same place?
 - finish go tests
 - set up .env and move things to it
+- move magic strings to constants for html files
+- embed HTML files
 
 
  - add namespaces
