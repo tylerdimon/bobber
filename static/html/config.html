@@ -1,0 +1,18 @@
+{{define "content"}}
+<h2>Config</h2>
+
+<h3>Namespaces</h3>
+<ul id="namespaces">
+    {{range .Data}}
+        <li>{{.Name}} | <a href="#">Edit</a></li>
+    {{end}}
+</ul>
+
+
+<h3>Endpoints</h3>
+<ul>
+    <li>endpoint 1</li>
+    <li>endpoint 2</li>
+    <li>endpoint 3</li>
+</ul>
+{{end}}

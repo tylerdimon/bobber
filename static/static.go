@@ -17,8 +17,10 @@ var html embed.FS
 const baseTemplatePath = "html/base.html"
 const requestsIndexPath = "html/index.html"
 const singleRequestPath = "html/request.html"
+const configPath = "html/config.html"
 
 var IndexTemplate *template.Template
+var ConfigTemplate *template.Template
 var RequestTemplate *template.Template
 
 func ParseHTML() {
@@ -30,6 +32,11 @@ func ParseHTML() {
 	}
 
 	RequestTemplate, err = template.ParseFS(html, singleRequestPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ConfigTemplate, err = template.ParseFS(html, baseTemplatePath, configPath)
 	if err != nil {
 		log.Fatal(err)
 	}

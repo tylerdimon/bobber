@@ -14,6 +14,7 @@ type Server struct {
 
 	WebsocketService bobber.WebsocketService
 	RequestService   bobber.RequestService
+	NamespaceService bobber.NamespaceService
 }
 
 func (s *Server) Init() {
@@ -32,6 +33,10 @@ func (s *Server) Init() {
 		Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
 
 	static.ParseHTML()
+
+	configHandler := &ConfigHandler{}
+	configHandler.NamespaceService = s.NamespaceService
+	configHandler.RegisterConfigRoutes(s.router)
 
 	requestHandler := &RequestHandler{}
 	requestHandler.Service = s.RequestService
