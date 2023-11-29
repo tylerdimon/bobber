@@ -13,6 +13,7 @@
 - config
   - html
     - add new
+    - add page should support update
 
 - think about routing in general
     - listener /{apiname}/{endpoint}
