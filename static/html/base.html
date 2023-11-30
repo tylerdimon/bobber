@@ -8,17 +8,23 @@
 <body>
 <header>
     <h1>Bobber</h1>
+
+    <nav>
+        <a href="/">Requests</a>
+        <a href="/config">Config</a>
+        <a href="#">Help</a>
+    </nav>
 </header>
 
 {{template "content" .}}
 
 <footer>
-    <p>made by tylerdimon.com</p>
+    <p>Made by <a href="https://tylerdimon.com">Tyler Dimon</a></p>
 </footer>
 </body>
 </html>
 <script>
-    document.getElementById("clearRequests").addEventListener("click", clearRequests);
+    document.getElementById("delete-requests").addEventListener("click", deleteRequests);
 
     var ws = new WebSocket("ws://localhost:8000/ws");
 

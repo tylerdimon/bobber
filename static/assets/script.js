@@ -1,10 +1,10 @@
 function addRequestToList(message) {
-    var list = document.getElementById("requestList");
+    var list = document.getElementById("request-list");
     list.innerHTML = message + list.innerHTML
 }
 
-function clearRequests() {
-    document.getElementById("requestList").innerHTML = '';
+function deleteRequests() {
+    document.getElementById("request-list").innerHTML = '';
 
     fetch('/api/requests/delete', { method: 'POST' })
         .then(response => {
@@ -17,4 +17,4 @@ function clearRequests() {
 }
 
 // exported for testability
-module.exports = { addRequestToList, clearRequests };
+module.exports = { addRequestToList, deleteRequests };

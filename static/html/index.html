@@ -1,11 +1,10 @@
 {{define "content"}}
-<div class="requests-header">
-    <h2>Requests</h2>
-    <button id="clearRequests">Clear All Requests</button>
-</div>
-<ul id="requestList">
+
+<h2>All Requests</h2>
+<button id="delete-requests">Clear All Requests</button>
+<div id="request-list">
     {{range .Data}}
         {{template "request" .}}
     {{end}}
-</ul>
+</div>
 {{end}}
