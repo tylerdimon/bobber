@@ -6,6 +6,7 @@ import (
 	"github.com/tylerdimon/bobber/static"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Server struct {
@@ -29,8 +30,16 @@ func (s *Server) Init() {
 	// Setup error handling routes.
 	//s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
 
-	s.router.PathPrefix("/static/").
-		Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
+	staticFilesDebugMode := os.Getenv("DEBUG")
+	if staticFilesDebugMode == "True" {
+		log.Println("Serving static files from directory...")
+		s.router.PathPrefix("/static/assets").
+			Handler(http.StripPrefix("/static/assets", http.FileServer(http.Dir("static/assets"))))
+	} else {
+		log.Println("Serving embedded static files...")
+		s.router.PathPrefix("/static/").
+			Handler(http.StripPrefix("/static/", http.FileServer(http.FS(static.Assets))))
+	}
 
 	static.ParseHTML()
 
