@@ -18,6 +18,18 @@ type Server struct {
 	NamespaceService bobber.NamespaceService
 }
 
+func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
+	// Override method for forms passing "_method" value.
+	if r.Method == http.MethodPost {
+		switch v := r.PostFormValue("_method"); v {
+		case http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
+			r.Method = v
+		}
+	}
+
+	s.router.ServeHTTP(w, r)
+}
+
 func (s *Server) Init() {
 	s.server = &http.Server{}
 	s.router = mux.NewRouter()
@@ -25,7 +37,7 @@ func (s *Server) Init() {
 	//Our router is wrapped by another function handler to perform some
 	//middleware-like tasks that cannot be performed by actual middleware.
 	//This includes changing route paths for JSON endpoints & overridding methods.
-	s.server.Handler = http.HandlerFunc(s.router.ServeHTTP)
+	s.server.Handler = http.HandlerFunc(s.serveHTTP)
 
 	// Setup error handling routes.
 	//s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
