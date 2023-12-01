@@ -53,7 +53,7 @@ func TestRecordRequestHandler(t *testing.T) {
 		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
-		Timestamp: "",
+		Timestamp: time.Now(), // TODO need to fix this test. mock out time somehow see what wtfdial does
 		Body:      `{"some":"json","body":"values"}`,
 		Headers:   "",
 	}
@@ -76,7 +76,7 @@ func TestGetAllRequestsHandler(t *testing.T) {
 		URL:       "123",
 		Host:      "",
 		Path:      "",
-		Timestamp: time.Now().String(),
+		Timestamp: time.Now(),
 		Body:      "",
 		Headers:   "",
 	}
@@ -86,7 +86,7 @@ func TestGetAllRequestsHandler(t *testing.T) {
 		URL:       "456",
 		Host:      "",
 		Path:      "",
-		Timestamp: time.Now().String(),
+		Timestamp: time.Now(),
 		Body:      "",
 		Headers:   "",
 	}

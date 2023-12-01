@@ -2,11 +2,18 @@
 
 ### FIX
 
-- clean up CSS
-- finish go tests
+- log the errors
+- clean up error handling
+- add tests
+
+
 - default sorting on queries
 - fix null strings with sqlx
 - split config handler to better match patterns?
+- some models should have created at / updated at instead of timestamp field
+- make sure sqlite service is handling timestamps properly
+- switch IDs over to UUID
+- MustParse probably needs to be replaced
 
 ### NEW
 

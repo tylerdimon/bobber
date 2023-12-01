@@ -44,7 +44,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		URL:       r.URL.String(),
 		Path:      r.URL.Path,
 		Host:      r.Host,
-		Timestamp: time.Now().Format(time.RFC3339),
+		Timestamp: time.Now().String(),
 		Body:      body,
 		Headers:   strings.Join(headers, ", "),
 	}

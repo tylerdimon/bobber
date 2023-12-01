@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS requests (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     method TEXT,
     url TEXT,
     host TEXT,

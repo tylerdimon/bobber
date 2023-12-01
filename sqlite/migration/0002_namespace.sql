@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS namespaces (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    slug TEXT,
-    name TEXT,
-    timestamp TEXT
+    id TEXT PRIMARY KEY,
+    slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT DEFAULT ''
 );

@@ -1,8 +1,10 @@
 package sqlite
 
 import (
+	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
 	"strconv"
+	"time"
 )
 
 type EndpointService struct {
@@ -17,8 +19,10 @@ func (s *EndpointService) GetAll() ([]bobber.Endpoint, error) {
 }
 
 func (s *EndpointService) Add(endpoint bobber.Endpoint) (*bobber.Endpoint, error) {
-	result, err := s.DB.conn.NamedExec(`INSERT INTO endpoints (slug, name, timestamp) 
-                                    VALUES (:slug, :name, :timestamp)`, &endpoint)
+	endpoint.ID = uuid.New().String()
+	endpoint.CreatedAt = time.Now().String()
+	result, err := s.DB.conn.NamedExec(`INSERT INTO endpoints (id, path, response, namespace_id, created_at) 
+                                    VALUES (:id, :path, :response, :namespace_id, :created_at)`, &endpoint)
 	if err != nil {
 		return nil, err
 	}

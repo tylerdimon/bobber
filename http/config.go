@@ -47,38 +47,7 @@ func (h *ConfigHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Re
 	id := vars["id"]
 
 	if r.Method == "GET" {
-		var title string
-		var namespace *bobber.Namespace
-		var err error
-
-		if id == "" {
-			title = "Add Namespace"
-		} else {
-			title = "Edit Namespace"
-			namespace, err = h.NamespaceService.GetByID(id)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		}
-
-		pageData := struct {
-			Title     string
-			Namespace *bobber.Namespace
-		}{
-			Title:     title,
-			Namespace: namespace,
-		}
-
-		err = static.NamespaceAddTemplate.Execute(w, pageData)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-
-	if r.Method == "PUT" {
-		// do update
-		fmt.Println("UPDATING NAMESPACE NOT YET IMPLEMENTED SORRY BOUT THAT")
+		h.serveNamespaceDetail(w, id)
 		return
 	}
 
@@ -89,22 +58,69 @@ func (h *ConfigHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	namespace := bobber.Namespace{
-		ID:        r.FormValue("id"),
-		Slug:      r.FormValue("slug"),
-		Name:      r.FormValue("name"),
-		Timestamp: r.FormValue("timestamp"),
+		Slug: r.FormValue("slug"),
+		Name: r.FormValue("name"),
 	}
 
-	added, err := h.NamespaceService.Add(namespace)
-	if err != nil {
-		http.Error(w, "Error adding to database", http.StatusInternalServerError)
-		return
-	}
+	if r.Method == "PUT" {
+		namespace.ID = id
+		updated, err := h.NamespaceService.Update(namespace)
+		if err != nil {
+			http.Error(w, "Error updating database", http.StatusInternalServerError)
+			return
+		}
 
-	// Print the namespace info. In a real application, you might save it to a database.
-	fmt.Printf("Namespace Added: %+v", added)
+		fmt.Printf("Namespace Updated: %+v", updated)
+
+	} else if r.Method == "POST" {
+		added, err := h.NamespaceService.Add(namespace)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error adding to database: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Printf("Namespace Added: %+v", added)
+	}
 
 	http.Redirect(w, r, "/config", http.StatusSeeOther)
+
+}
+
+func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
+	var title string
+	var namespace *bobber.Namespace
+	var err error
+
+	if id == "" {
+		title = "Add Namespace"
+	} else {
+		title = "Edit Namespace"
+		namespace, err = h.NamespaceService.GetByID(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
+	pageData := struct {
+		Title     string
+		Namespace *bobber.Namespace
+	}{
+		Title:     title,
+		Namespace: namespace,
+	}
+
+	err = static.NamespaceAddTemplate.Execute(w, pageData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
+}
+
+func namespaceAdd() {
+
+}
+
+func namespaceUpdate() {
 
 }
 
@@ -137,13 +153,13 @@ func (h *ConfigHandler) addEndpointHandler(w http.ResponseWriter, r *http.Reques
 	endpoint := bobber.Endpoint{
 		Path:        r.FormValue("path"),
 		Response:    r.FormValue("response"),
-		CreatedAt:   time.Now().Format(time.RFC3339),
+		CreatedAt:   time.Now().String(),
 		NamespaceID: namespaceID,
 	}
 
 	added, err := h.EndpointService.Add(endpoint)
 	if err != nil {
-		http.Error(w, "Error adding to database", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error adding to database: %v", err), http.StatusInternalServerError)
 		return
 	}
 
