@@ -116,14 +116,6 @@ func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 	return
 }
 
-func namespaceAdd() {
-
-}
-
-func namespaceUpdate() {
-
-}
-
 func (h *ConfigHandler) addEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	namespaceID := vars["id"]

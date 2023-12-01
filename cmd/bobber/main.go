@@ -29,7 +29,7 @@ func main() {
 	namespaceService.DB = db
 
 	endpointService := &sqlite.EndpointService{}
-	namespaceService.DB = db
+	endpointService.DB = db
 
 	websocketService := &ws.WebsocketService{}
 	websocketService.Init()
