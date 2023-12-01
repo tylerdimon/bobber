@@ -1,5 +1,19 @@
 {{define "content"}}
-<h2>Add New Namespace</h2>
+<h2>{{.Title}}</h2>
+
+{{if .Namespace}}
+<form action="/config/namespace/{{.Namespace.ID}}" method="post">
+    <input type="hidden" name="_method" value="PUT" />
+
+    <label for="slug">Slug:</label><br>
+    <input type="text" id="slug" name="slug" value="{{.Namespace.Slug}}" required><br>
+
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name" value="{{.Namespace.Name}}" required><br>
+
+    <input type="submit" value="Save">
+</form>
+{{else}}
 <form action="/config/namespace" method="post">
     <label for="slug">Slug:</label><br>
     <input type="text" id="slug" name="slug" required><br>
@@ -7,8 +21,9 @@
     <label for="name">Name:</label><br>
     <input type="text" id="name" name="name" required><br>
 
-    <input type="submit" value="Submit">
+    <input type="submit" value="Add">
 </form>
+{{end}}
 
 <h3>Endpoints</h3>
 <ul>

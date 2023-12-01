@@ -28,6 +28,9 @@ func main() {
 	namespaceService := &sqlite.NamespaceService{}
 	namespaceService.DB = db
 
+	endpointService := &sqlite.EndpointService{}
+	namespaceService.DB = db
+
 	websocketService := &ws.WebsocketService{}
 	websocketService.Init()
 	go websocketService.HandleMessages()
@@ -36,6 +39,7 @@ func main() {
 	server.WebsocketService = websocketService
 	server.RequestService = requestService
 	server.NamespaceService = namespaceService
+	server.EndpointService = endpointService
 	server.Init()
 	err = server.Run()
 	if err != nil {

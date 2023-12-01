@@ -1,0 +1,12 @@
+{{define "content"}}
+<h2>Add New Endpoint</h2>
+<form action="/config/namespace/{{.NamespaceID}}/endpoint" method="post">
+    <label for="path">Path:</label><br>
+    <input type="text" id="path" name="path" required><br>
+
+    <label for="response">Response:</label><br>
+    <textarea id="response" name="response" required></textarea><br>
+
+    <input type="submit" value="Submit">
+</form>
+{{end}}

@@ -16,6 +16,7 @@ type Server struct {
 	WebsocketService bobber.WebsocketService
 	RequestService   bobber.RequestService
 	NamespaceService bobber.NamespaceService
+	EndpointService  bobber.EndpointService
 }
 
 func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {

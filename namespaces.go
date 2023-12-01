@@ -8,7 +8,7 @@ type Namespace struct {
 }
 
 type NamespaceService interface {
-	//GetByID(id string) (Namespace, error)
+	GetByID(id string) (*Namespace, error)
 	GetAll() ([]Namespace, error)
 	Add(request Namespace) (*Namespace, error)
 	//Update(request Namespace) (Namespace, error)

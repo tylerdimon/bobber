@@ -4,26 +4,24 @@
 
 - clean up CSS
 - finish go tests
-- set up .env file
 - default sorting on queries
 - fix null strings with sqlx
+- split config handler to better match patterns?
 
 ### NEW
 
-- config
-  - html
-    - add new
-    - add page should support update
+- add namespace & endpoint logic to request handler
+- update endpoint
+- delete namespace
+- delete endpoint
+- add default response to namespace
+- add database column mappings to structs
+- some models should have created at / updated at instead of timestamp field
 
 - think about routing in general
     - listener /{apiname}/{endpoint}
     - config /config/{apiname}/{endpoint-slug}
     - ui / -> /ui/{apiname}/{endpoint-slug} (because listener should never need / url, we should redirect to UI for better UX)
-
-- add endpoints
-   - path to match again incoming requests
-   - response
- - add support for multiple APIS / namespaces
 
  - import / export namespaces and endpoints to JSON
 

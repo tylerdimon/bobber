@@ -9,6 +9,12 @@ type NamespaceService struct {
 	DB *DB
 }
 
+func (s *NamespaceService) GetByID(id string) (*bobber.Namespace, error) {
+	var namespace bobber.Namespace
+	err := s.DB.conn.Get(&namespace, "SELECT * FROM namespaces WHERE id = ?", id)
+	return &namespace, err
+}
+
 func (s *NamespaceService) GetAll() ([]bobber.Namespace, error) {
 	// TODO alphabetical by name ordering
 	var spaces []bobber.Namespace

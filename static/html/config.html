@@ -5,15 +5,7 @@
 <a href="/config/namespace">Add</a>
 <ul id="namespaces">
     {{range .Data}}
-        <li>{{.Name}} | <a href="#">View Requests</a> | <a href="#">Edit</a></li>
+        <li>{{.Name}} | <a href="#">View Requests</a> | <a href="/config/namespace/{{.ID}}">Edit</a></li>
     {{end}}
-</ul>
-
-
-<h3>Endpoints</h3>
-<ul>
-    <li>endpoint 1</li>
-    <li>endpoint 2</li>
-    <li>endpoint 3</li>
 </ul>
 {{end}}

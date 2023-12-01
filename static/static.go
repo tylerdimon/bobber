@@ -18,12 +18,14 @@ const baseTemplatePath = "html/base.html"
 const requestsIndexPath = "html/index.html"
 const singleRequestPath = "html/request.html"
 const configPath = "html/config.html"
-const namespaceAddPath = "html/namespace-add.html"
+const namespaceAddPath = "html/namespace-detail.html"
+const endpointAddPath = "html/endpoint-add.html"
 
 var IndexTemplate *template.Template
 var ConfigTemplate *template.Template
 var RequestTemplate *template.Template
 var NamespaceAddTemplate *template.Template
+var EndpointAddTemplate *template.Template
 
 func ParseHTML() {
 	var err error
@@ -44,6 +46,11 @@ func ParseHTML() {
 	}
 
 	NamespaceAddTemplate, err = template.ParseFS(html, baseTemplatePath, namespaceAddPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	EndpointAddTemplate, err = template.ParseFS(html, baseTemplatePath, endpointAddPath)
 	if err != nil {
 		log.Fatal(err)
 	}
