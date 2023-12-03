@@ -1,14 +1,12 @@
 package mock
 
 import (
-	"fmt"
 	"github.com/tylerdimon/bobber"
-	"github.com/tylerdimon/bobber/sqlite"
 )
 
 type RequestService struct {
 	Requests []bobber.Request
-	DB       *sqlite.DB
+	Gen      bobber.Generator
 
 	GetByIDCalled    int
 	GetAllCalled     int
@@ -19,11 +17,8 @@ type RequestService struct {
 }
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
-	fmt.Println("IN THE ADD")
-	fmt.Println(s.DB)
-
-	request.ID = s.DB.UUID().String()
-	request.Timestamp = s.DB.Now().String()
+	request.ID = s.Gen.UUID().String()
+	request.Timestamp = s.Gen.Now().String()
 
 	s.AddCalled = s.AddCalled + 1
 	s.Requests = append(s.Requests, request)

@@ -6,7 +6,8 @@ import (
 )
 
 type RequestService struct {
-	DB *DB
+	DB  *DB
+	Gen bobber.Generator
 }
 
 func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
@@ -23,8 +24,8 @@ func (s *RequestService) GetAll() ([]bobber.Request, error) {
 }
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
-	request.ID = s.DB.UUID().String()
-	request.Timestamp = s.DB.Now().String()
+	request.ID = s.Gen.UUID().String()
+	request.Timestamp = s.Gen.Now().String()
 	// TODO convert timestamp
 	result, err := s.DB.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
 	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request)

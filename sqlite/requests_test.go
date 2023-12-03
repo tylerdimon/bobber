@@ -6,18 +6,21 @@ import (
 	"testing"
 )
 
-// make sure to close DB after tests
+// TODO make sure to close DB after tests and delete files
 // TODO figure out a better way to handle beforeAll / afterAll
+
 func GetService(t *testing.T) *RequestService {
-	db := mock.InitTestDB()
-	db.DSN = "test.sqlite"
+	db := &DB{
+		DSN: ":memory:",
+	}
+
 	if err := db.Open(); err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
 
 	requestService := &RequestService{
-		DB: db,
+		DB:  db,
+		Gen: mock.Generator(),
 	}
 
 	return requestService
@@ -26,12 +29,12 @@ func GetService(t *testing.T) *RequestService {
 func TestGetByID(t *testing.T) {
 	service := GetService(t)
 	_, err := service.Add(bobber.Request{
-		ID:        mock.StaticUUID,
+		ID:        mock.StaticUUIDValue,
 		Method:    "GET",
 		URL:       "/path/one",
 		Host:      "google.com",
 		Path:      "",
-		Timestamp: mock.StaticTime,
+		Timestamp: mock.StaticTimeValue,
 		Body:      "",
 		Headers:   "",
 	})
@@ -47,15 +50,15 @@ func TestGetByID(t *testing.T) {
 	}{
 		{
 			name: "Get Request By ID",
-			id:   mock.StaticUUID,
+			id:   mock.StaticUUIDValue,
 			wantRequest: &bobber.Request{
-				ID:        mock.StaticUUID,
+				ID:        mock.StaticUUIDValue,
 				Method:    "GET",
 				URL:       "/path/one",
 				Host:      "google.com",
 				Path:      "",
-				Timestamp: mock.StaticTime,
-				Body:      "",
+				Timestamp: mock.StaticTimeValue,
+				Body:      " ",
 				Headers:   "",
 			},
 			wantErr: false,
@@ -75,6 +78,7 @@ func TestGetByID(t *testing.T) {
 				return
 			}
 			if !tt.wantErr && got != tt.wantRequest {
+				// TODO fix currently failing on timestamps
 				t.Errorf("GetByID() got = %v, want %v", got, tt.wantRequest)
 			}
 		})

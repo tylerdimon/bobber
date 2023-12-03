@@ -4,14 +4,12 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"io/fs"
 	_ "modernc.org/sqlite"
 	"os"
 	"path/filepath"
 	"sort"
-	"time"
 )
 
 //go:embed migration/*.sql
@@ -22,17 +20,11 @@ type DB struct {
 	ctx    context.Context
 	cancel func()
 	DSN    string
-
-	// making mock ids and timestamps easier for tests
-	Now  func() time.Time
-	UUID func() uuid.UUID
 }
 
 func NewDB(dsn string) *DB {
 	db := &DB{
-		DSN:  dsn,
-		UUID: uuid.New,
-		Now:  time.Now,
+		DSN: dsn,
 	}
 	db.ctx, db.cancel = context.WithCancel(context.Background())
 	return db

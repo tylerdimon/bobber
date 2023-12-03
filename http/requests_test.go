@@ -12,10 +12,8 @@ import (
 )
 
 func setup() (*mock.RequestService, *mock.WebsocketService) {
-	mockDB := mock.InitTestDB()
-
 	mockService := new(mock.RequestService)
-	mockService.DB = mockDB
+	mockService.Gen = mock.Generator()
 
 	websocketService := new(mock.WebsocketService)
 	websocketService.Init()
@@ -58,12 +56,12 @@ func TestRecordRequestHandler(t *testing.T) {
 	}
 
 	expectedRequest := bobber.Request{
-		ID:        mock.StaticUUID,
+		ID:        mock.StaticUUIDValue,
 		Method:    "POST",
 		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
-		Timestamp: mock.StaticTime,
+		Timestamp: mock.StaticTimeValue,
 		Body:      `{"some":"json","body":"values"}`,
 		Headers:   "",
 	}
@@ -84,22 +82,22 @@ func TestGetAllRequestsHandler(t *testing.T) {
 	}
 
 	expectedRequest1 := bobber.Request{
-		ID:        mock.StaticUUID,
+		ID:        mock.StaticUUIDValue,
 		Method:    "",
 		URL:       "123",
 		Host:      "",
 		Path:      "",
-		Timestamp: mock.StaticTime,
+		Timestamp: mock.StaticTimeValue,
 		Body:      "",
 		Headers:   "",
 	}
 	expectedRequest2 := bobber.Request{
-		ID:        mock.StaticUUID,
+		ID:        mock.StaticUUIDValue,
 		Method:    "",
 		URL:       "456",
 		Host:      "",
 		Path:      "",
-		Timestamp: mock.StaticTime,
+		Timestamp: mock.StaticTimeValue,
 		Body:      "",
 		Headers:   "",
 	}
