@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/static"
+	"log"
 	"net/http"
 	"time"
 )
@@ -70,7 +71,7 @@ func (h *ConfigHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		fmt.Printf("Namespace Updated: %+v", updated)
+		log.Printf("Namespace Updated: %+v", updated)
 
 	} else if r.Method == "POST" {
 		added, err := h.NamespaceService.Add(namespace)
@@ -79,7 +80,7 @@ func (h *ConfigHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Re
 			return
 		}
 
-		fmt.Printf("Namespace Added: %+v", added)
+		log.Printf("Namespace Added: %+v", added)
 	}
 
 	http.Redirect(w, r, "/config", http.StatusSeeOther)
@@ -156,7 +157,7 @@ func (h *ConfigHandler) addEndpointHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Print the namespace info. In a real application, you might save it to a database.
-	fmt.Printf("Endpoint Added: %+v", added)
+	log.Printf("Endpoint Added: %+v", added)
 
 	http.Redirect(w, r, fmt.Sprintf("/config/namespace/%v", namespaceID), http.StatusSeeOther)
 }

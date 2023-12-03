@@ -56,12 +56,12 @@ func TestRecordRequestHandler(t *testing.T) {
 	}
 
 	expectedRequest := bobber.Request{
-		ID:        mock.StaticUUIDValue,
+		ID:        mock.UUIDString,
 		Method:    "POST",
 		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
-		Timestamp: mock.StaticTimeValue,
+		Timestamp: mock.TimestampString,
 		Body:      `{"some":"json","body":"values"}`,
 		Headers:   "",
 	}
@@ -82,22 +82,22 @@ func TestGetAllRequestsHandler(t *testing.T) {
 	}
 
 	expectedRequest1 := bobber.Request{
-		ID:        mock.StaticUUIDValue,
+		ID:        mock.UUIDString,
 		Method:    "",
 		URL:       "123",
 		Host:      "",
 		Path:      "",
-		Timestamp: mock.StaticTimeValue,
+		Timestamp: mock.TimestampString,
 		Body:      "",
 		Headers:   "",
 	}
 	expectedRequest2 := bobber.Request{
-		ID:        mock.StaticUUIDValue,
+		ID:        mock.UUIDString,
 		Method:    "",
 		URL:       "456",
 		Host:      "",
 		Path:      "",
-		Timestamp: mock.StaticTimeValue,
+		Timestamp: mock.TimestampString,
 		Body:      "",
 		Headers:   "",
 	}

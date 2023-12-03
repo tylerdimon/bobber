@@ -2,65 +2,86 @@ package sqlite
 
 import (
 	"context"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
-	"reflect"
 	"testing"
 )
 
-func GetService(t *testing.T) *RequestService {
+func initDB() (*DB, error) {
 	db := &DB{
 		DSN: ":memory:",
 	}
 	db.ctx, db.cancel = context.WithCancel(context.Background())
-
-	if err := db.Open(); err != nil {
-		t.Fatal(err)
+	err := db.Open()
+	if err != nil {
+		return nil, err
 	}
-
-	requestService := &RequestService{
-		DB:  db,
-		Gen: mock.Generator(),
-	}
-
-	return requestService
+	return db, nil
 }
 
-func TestGetByID(t *testing.T) {
-	service := GetService(t)
-	defer service.DB.Close()
-
-	_, err := service.Add(bobber.Request{
-		ID:        mock.StaticUUIDValue,
+func populateDB(db *DB) error {
+	request := bobber.Request{
+		ID:        mock.UUIDString,
+		Timestamp: mock.TimestampString,
 		Method:    "GET",
 		URL:       "/path/one",
 		Host:      "google.com",
 		Path:      "",
-		Timestamp: mock.StaticTimeValue,
 		Body:      "",
 		Headers:   "",
-	})
+	}
+	_, err := db.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
+	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request)
 	if err != nil {
-		t.Fatal(err)
+		return err
+	}
+
+	request2 := bobber.Request{
+		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+		Timestamp: "2009-11-10 23:00:01 +0000 UTC",
+		Method:    "POST",
+		URL:       "/path/two",
+		Host:      "example.com",
+		Path:      "",
+		Body:      "some body text",
+		Headers:   "",
+	}
+	_, err = db.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
+	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request2)
+	return err
+}
+
+func TestGetByID(t *testing.T) {
+	db, err := initDB()
+	require.Nil(t, err)
+	defer db.Close()
+
+	err = populateDB(db)
+	require.Nil(t, err)
+
+	service := &RequestService{
+		DB: db,
 	}
 
 	tests := []struct {
-		name        string
-		id          string
-		wantRequest *bobber.Request
-		wantErr     bool
+		name     string
+		id       string
+		expected bobber.Request
+		wantErr  bool
 	}{
 		{
 			name: "Get Request By ID",
-			id:   mock.StaticUUIDValue,
-			wantRequest: &bobber.Request{
-				ID:        mock.StaticUUIDValue,
+			id:   mock.UUIDString,
+			expected: bobber.Request{
+				ID:        mock.UUIDString,
 				Method:    "GET",
 				URL:       "/path/one",
 				Host:      "google.com",
 				Path:      "",
-				Timestamp: mock.StaticTimeValue,
-				Body:      " ",
+				Timestamp: mock.TimestampString,
+				Body:      "",
 				Headers:   "",
 			},
 			wantErr: false,
@@ -79,34 +100,76 @@ func TestGetByID(t *testing.T) {
 				t.Errorf("GetByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && reflect.DeepEqual(got, tt.wantRequest) {
-				t.Errorf("GetByID() got = %v, want %v", got, tt.wantRequest)
+			if !tt.wantErr && *got != tt.expected {
+				t.Errorf("GetByID() got = %v, want %v", got, tt.expected)
 			}
 		})
 	}
 }
 
-//GetByID:
-//Test retrieving an existing request.
-//Test retrieving a non-existing request.
-//Test database errors (using mocking).
-//
-//GetAll:
-//Test retrieving when there are multiple requests in the database.
-//Test retrieving when the database is empty.
-//Test database errors.
-//
-//Add:
-//Test adding a new request.
-//Test adding a request with incomplete or invalid data.
-//Test database errors.
-//
-//DeleteByID:
-//Test deleting an existing request.
-//Test deleting a non-existing request.
-//Test database errors.
-//
-//DeleteAll:
-//Test deleting when there are multiple requests.
-//Test deleting when the database is empty.
-//Test database errors.
+func TestGetAll(t *testing.T) {
+	db, err := initDB()
+	require.Nil(t, err)
+	defer db.Close()
+
+	err = populateDB(db)
+	require.Nil(t, err)
+
+	service := &RequestService{
+		DB: db,
+	}
+
+	expected := []bobber.Request{
+		{
+			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+			Method:    "POST",
+			URL:       "/path/two",
+			Host:      "example.com",
+			Path:      "",
+			Timestamp: "2009-11-10 23:00:01 +0000 UTC",
+			Body:      "some body text",
+			Headers:   "",
+		},
+		{
+			ID:        mock.UUIDString,
+			Method:    "GET",
+			URL:       "/path/one",
+			Host:      "google.com",
+			Path:      "",
+			Timestamp: mock.TimestampString,
+			Body:      "",
+			Headers:   "",
+		},
+	}
+
+	actual, err := service.GetAll()
+	if err != nil {
+		t.Errorf("GetAll() got unexpected error %v", err)
+	}
+	assert.Equal(t, expected, actual)
+}
+
+func TestDeleteAll(t *testing.T) {
+	db, err := initDB()
+	require.Nil(t, err)
+	defer db.Close()
+
+	err = populateDB(db)
+	require.Nil(t, err)
+
+	service := &RequestService{
+		DB: db,
+	}
+
+	err = service.DeleteAll()
+	assert.Nil(t, err)
+
+	var count int
+	err = db.conn.Get(&count, "SELECT COUNT(*) FROM requests")
+	require.Nil(t, err)
+	assert.Equal(t, 0, count)
+}
+
+//Add
+
+//DeleteByID
