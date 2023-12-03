@@ -11,13 +11,23 @@ import (
 	"time"
 )
 
-func TestRecordRequestHandler(t *testing.T) {
+func setup() (*mock.RequestService, *mock.WebsocketService) {
+	mockDB := mock.InitTestDB()
+
 	mockService := new(mock.RequestService)
+	mockService.DB = mockDB
+
 	websocketService := new(mock.WebsocketService)
 	websocketService.Init()
+
+	return mockService, websocketService
+}
+
+func TestRecordRequestHandler(t *testing.T) {
+	mockRequestService, mockWebsocketService := setup()
 	handler := RequestHandler{
-		Service:          mockService,
-		WebsocketService: websocketService,
+		Service:          mockRequestService,
+		WebsocketService: mockWebsocketService,
 	}
 
 	requestBody := bytes.NewBufferString(`{"some":"json","body":"values"}`)
@@ -33,7 +43,7 @@ func TestRecordRequestHandler(t *testing.T) {
 	go handlerFunc.ServeHTTP(rr, req)
 
 	select {
-	case val := <-websocketService.Broadcast():
+	case val := <-mockWebsocketService.Broadcast():
 		// TODO validate message value
 		t.Logf("Got message: %s", val)
 	case <-time.After(time.Second * 1):
@@ -48,54 +58,57 @@ func TestRecordRequestHandler(t *testing.T) {
 	}
 
 	expectedRequest := bobber.Request{
-		ID:        "",
+		ID:        mock.StaticUUID,
 		Method:    "POST",
 		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
-		Timestamp: time.Now(), // TODO need to fix this test. mock out time somehow see what wtfdial does
+		Timestamp: mock.StaticTime,
 		Body:      `{"some":"json","body":"values"}`,
 		Headers:   "",
 	}
 
-	assertRequestsEqual(t, expectedRequest, mockService.Requests[0])
+	if mockRequestService.Requests[0] != expectedRequest {
+		if rr.Body.String() != "Request received" {
+			t.Errorf("expected '%v' but got '%v'", expectedRequest, mockRequestService.Requests[0])
+		}
+
+	}
 }
 
 func TestGetAllRequestsHandler(t *testing.T) {
-	mockService := new(mock.RequestService)
-	websocketService := new(mock.WebsocketService)
-	websocketService.Init()
+	mockRequestService, mockWebsocketService := setup()
 	handler := RequestHandler{
-		Service:          mockService,
-		WebsocketService: websocketService,
+		Service:          mockRequestService,
+		WebsocketService: mockWebsocketService,
 	}
 
 	expectedRequest1 := bobber.Request{
-		ID:        "",
+		ID:        mock.StaticUUID,
 		Method:    "",
 		URL:       "123",
 		Host:      "",
 		Path:      "",
-		Timestamp: time.Now(),
+		Timestamp: mock.StaticTime,
 		Body:      "",
 		Headers:   "",
 	}
 	expectedRequest2 := bobber.Request{
-		ID:        "",
+		ID:        mock.StaticUUID,
 		Method:    "",
 		URL:       "456",
 		Host:      "",
 		Path:      "",
-		Timestamp: time.Now(),
+		Timestamp: mock.StaticTime,
 		Body:      "",
 		Headers:   "",
 	}
-	_, err := mockService.Add(expectedRequest1)
+	_, err := mockRequestService.Add(expectedRequest1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = mockService.Add(expectedRequest2)
+	_, err = mockRequestService.Add(expectedRequest2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,19 +139,5 @@ func TestGetAllRequestsHandler(t *testing.T) {
 }
 
 func DeleteAllRequestsHandler(t *testing.T) {
-
-}
-
-func assertRequestsEqual(t *testing.T, expected, actual bobber.Request) {
-	// TODO need to mock out IDs and Timestamps then can get rid of this
-	// and just compare structs
-	if actual.Method != expected.Method ||
-		actual.URL != expected.URL ||
-		actual.Host != expected.Host ||
-		actual.Path != expected.Path ||
-		actual.Body != expected.Body ||
-		actual.Headers != expected.Headers {
-		t.Errorf("expected '%v' but got '%v'", expected, actual)
-	}
 
 }

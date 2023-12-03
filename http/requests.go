@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type RequestHandler struct {
@@ -40,21 +39,21 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	request := bobber.Request{
-		Method:    r.Method,
-		URL:       r.URL.String(),
-		Path:      r.URL.Path,
-		Host:      r.Host,
-		Timestamp: time.Now().String(),
-		Body:      body,
-		Headers:   strings.Join(headers, ", "),
+		Method:  r.Method,
+		URL:     r.URL.String(),
+		Path:    r.URL.Path,
+		Host:    r.Host,
+		Body:    body,
+		Headers: strings.Join(headers, ", "),
 	}
 
-	if _, err := h.Service.Add(request); err != nil {
+	savedRequest, err := h.Service.Add(request)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	h.WebsocketService.Broadcast() <- &request
+	h.WebsocketService.Broadcast() <- savedRequest
 
 	w.Write([]byte("Request received"))
 }

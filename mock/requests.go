@@ -1,9 +1,14 @@
 package mock
 
-import "github.com/tylerdimon/bobber"
+import (
+	"fmt"
+	"github.com/tylerdimon/bobber"
+	"github.com/tylerdimon/bobber/sqlite"
+)
 
 type RequestService struct {
 	Requests []bobber.Request
+	DB       *sqlite.DB
 
 	GetByIDCalled    int
 	GetAllCalled     int
@@ -13,33 +18,39 @@ type RequestService struct {
 	DeleteAllCalled  int
 }
 
-func (m *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
-	m.AddCalled = m.AddCalled + 1
-	m.Requests = append(m.Requests, request)
+func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
+	fmt.Println("IN THE ADD")
+	fmt.Println(s.DB)
+
+	request.ID = s.DB.UUID().String()
+	request.Timestamp = s.DB.Now().String()
+
+	s.AddCalled = s.AddCalled + 1
+	s.Requests = append(s.Requests, request)
 	return nil, nil
 }
 
-func (m *RequestService) GetByID(id string) (bobber.Request, error) {
-	m.GetByIDCalled = m.GetByIDCalled + 1
+func (s *RequestService) GetByID(id string) (bobber.Request, error) {
+	s.GetByIDCalled = s.GetByIDCalled + 1
 	return bobber.Request{}, nil
 }
 
-func (m *RequestService) GetAll() ([]bobber.Request, error) {
-	m.GetAllCalled = m.GetAllCalled + 1
-	return m.Requests, nil
+func (s *RequestService) GetAll() ([]bobber.Request, error) {
+	s.GetAllCalled = s.GetAllCalled + 1
+	return s.Requests, nil
 }
 
-func (m *RequestService) Update(request bobber.Request) (bobber.Request, error) {
-	m.UpdateCalled = m.UpdateCalled + 1
+func (s *RequestService) Update(request bobber.Request) (bobber.Request, error) {
+	s.UpdateCalled = s.UpdateCalled + 1
 	return request, nil
 }
 
-func (m *RequestService) DeleteByID(id string) (bobber.Request, error) {
-	m.DeleteByIDCalled = m.DeleteByIDCalled + 1
+func (s *RequestService) DeleteByID(id string) (bobber.Request, error) {
+	s.DeleteByIDCalled = s.DeleteByIDCalled + 1
 	return bobber.Request{}, nil
 }
 
-func (m *RequestService) DeleteAll() error {
-	m.DeleteAllCalled = m.DeleteAllCalled + 1
+func (s *RequestService) DeleteAll() error {
+	s.DeleteAllCalled = s.DeleteAllCalled + 1
 	return nil
 }

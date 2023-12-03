@@ -5,15 +5,8 @@
 - log the errors
 - clean up error handling
 - add tests
-
-
 - default sorting on queries
-- fix null strings with sqlx
-- split config handler to better match patterns?
-- some models should have created at / updated at instead of timestamp field
-- make sure sqlite service is handling timestamps properly
-- switch IDs over to UUID
-- MustParse probably needs to be replaced
+- split config http handler up
 
 ### NEW
 
@@ -22,8 +15,6 @@
 - delete namespace
 - delete endpoint
 - add default response to namespace
-- add database column mappings to structs
-- some models should have created at / updated at instead of timestamp field
 
 - think about routing in general
     - listener /{apiname}/{endpoint}

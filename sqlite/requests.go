@@ -1,10 +1,8 @@
 package sqlite
 
 import (
-	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
 	"log"
-	"time"
 )
 
 type RequestService struct {
@@ -25,8 +23,8 @@ func (s *RequestService) GetAll() ([]bobber.Request, error) {
 }
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
-	request.ID = uuid.New().String()
-	request.Timestamp = time.Now().String()
+	request.ID = s.DB.UUID().String()
+	request.Timestamp = s.DB.Now().String()
 	// TODO convert timestamp
 	result, err := s.DB.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
 	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request)
