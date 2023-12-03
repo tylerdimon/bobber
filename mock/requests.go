@@ -30,9 +30,9 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	return nil, nil
 }
 
-func (s *RequestService) GetByID(id string) (bobber.Request, error) {
+func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
 	s.GetByIDCalled = s.GetByIDCalled + 1
-	return bobber.Request{}, nil
+	return nil, nil
 }
 
 func (s *RequestService) GetAll() ([]bobber.Request, error) {
@@ -45,9 +45,9 @@ func (s *RequestService) Update(request bobber.Request) (bobber.Request, error) 
 	return request, nil
 }
 
-func (s *RequestService) DeleteByID(id string) (bobber.Request, error) {
+func (s *RequestService) DeleteByID(id string) (*bobber.Request, error) {
 	s.DeleteByIDCalled = s.DeleteByIDCalled + 1
-	return bobber.Request{}, nil
+	return nil, nil
 }
 
 func (s *RequestService) DeleteAll() error {

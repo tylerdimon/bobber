@@ -1,5 +1,16 @@
 ## TODO
 
+### TESTS
+
+- http
+  - request
+  - endpoint
+  - namespace
+- sqlite
+  - request
+  - endpoint
+  - namespace
+
 ### FIX
 
 - log the errors

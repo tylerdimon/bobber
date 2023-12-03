@@ -9,10 +9,10 @@ type RequestService struct {
 	DB *DB
 }
 
-func (s *RequestService) GetByID(id string) (bobber.Request, error) {
+func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
 	var req bobber.Request
 	err := s.DB.conn.Get(&req, "SELECT * FROM requests WHERE id = ?", id)
-	return req, err
+	return &req, err
 }
 
 func (s *RequestService) GetAll() ([]bobber.Request, error) {
@@ -41,10 +41,10 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	return &request, nil
 }
 
-func (s *RequestService) DeleteByID(id string) (bobber.Request, error) {
+func (s *RequestService) DeleteByID(id string) (*bobber.Request, error) {
 	req, err := s.GetByID(id)
 	if err != nil {
-		return bobber.Request{}, err
+		return nil, err
 	}
 
 	_, err = s.DB.conn.Exec("DELETE FROM requests WHERE id = ?", id)

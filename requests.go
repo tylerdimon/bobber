@@ -22,9 +22,9 @@ func (r Request) String() string {
 }
 
 type RequestService interface {
-	GetByID(id string) (Request, error)
+	GetByID(id string) (*Request, error)
 	GetAll() ([]Request, error)
 	Add(request Request) (*Request, error)
-	DeleteByID(id string) (Request, error)
+	DeleteByID(id string) (*Request, error)
 	DeleteAll() error
 }
