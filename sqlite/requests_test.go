@@ -1,18 +1,18 @@
 package sqlite
 
 import (
+	"context"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
+	"reflect"
 	"testing"
 )
-
-// TODO make sure to close DB after tests and delete files
-// TODO figure out a better way to handle beforeAll / afterAll
 
 func GetService(t *testing.T) *RequestService {
 	db := &DB{
 		DSN: ":memory:",
 	}
+	db.ctx, db.cancel = context.WithCancel(context.Background())
 
 	if err := db.Open(); err != nil {
 		t.Fatal(err)
@@ -28,6 +28,8 @@ func GetService(t *testing.T) *RequestService {
 
 func TestGetByID(t *testing.T) {
 	service := GetService(t)
+	defer service.DB.Close()
+
 	_, err := service.Add(bobber.Request{
 		ID:        mock.StaticUUIDValue,
 		Method:    "GET",
@@ -77,8 +79,7 @@ func TestGetByID(t *testing.T) {
 				t.Errorf("GetByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && got != tt.wantRequest {
-				// TODO fix currently failing on timestamps
+			if !tt.wantErr && reflect.DeepEqual(got, tt.wantRequest) {
 				t.Errorf("GetByID() got = %v, want %v", got, tt.wantRequest)
 			}
 		})
