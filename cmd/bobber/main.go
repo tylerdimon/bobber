@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/joho/godotenv"
+	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/http"
 	"github.com/tylerdimon/bobber/sqlite"
 	"github.com/tylerdimon/bobber/ws"
@@ -22,8 +23,11 @@ func main() {
 	}
 	defer db.Close()
 
+	generator := bobber.GetGenerator()
+
 	requestService := &sqlite.RequestService{}
 	requestService.DB = db
+	requestService.Gen = generator
 
 	namespaceService := &sqlite.NamespaceService{}
 	namespaceService.DB = db

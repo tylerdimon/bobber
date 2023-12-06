@@ -1,5 +1,8 @@
 ## TODO
 
+- setup air or a auto reloader
+- setup debugger. delve i think?
+
 ### TESTS
 
 - http

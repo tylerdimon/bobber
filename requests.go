@@ -1,19 +1,22 @@
 package bobber
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 )
 
 type Request struct {
-	ID        string `json:"id" db:"id"` // uuid.UUID format
-	Method    string `json:"method" db:"method"`
-	URL       string `json:"url" db:"url"`
-	Host      string `json:"host" db:"host"`
-	Path      string `json:"path" db:"path"`
-	Timestamp string `json:"timestamp" db:"timestamp"` // time.Time default format
-	Body      string `json:"body" db:"body"`
-	Headers   string `json:"headers" db:"headers"`
+	ID          string         `json:"id" db:"id"` // uuid.UUID format
+	Method      string         `json:"method" db:"method"`
+	URL         string         `json:"url" db:"url"`
+	Host        string         `json:"host" db:"host"`
+	Path        string         `json:"path" db:"path"`
+	Timestamp   string         `json:"timestamp" db:"timestamp"` // time.Time default format
+	Body        string         `json:"body" db:"body"`
+	Headers     string         `json:"headers" db:"headers"`
+	NamespaceID sql.NullString `json:"namespaceId" db:"namespace_id"`
+	EndpointID  sql.NullString `json:"endpointId" db:"endpoint_id"`
 }
 
 func (r Request) String() string {

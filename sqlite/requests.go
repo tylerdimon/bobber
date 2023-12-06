@@ -17,7 +17,6 @@ func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
 }
 
 func (s *RequestService) GetAll() ([]bobber.Request, error) {
-	// TODO add ordering by timestamp descending
 	var reqs []bobber.Request
 	err := s.DB.conn.Select(&reqs, "SELECT * FROM requests ORDER BY timestamp DESC")
 	return reqs, err
