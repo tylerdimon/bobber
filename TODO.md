@@ -1,5 +1,12 @@
 ## TODO
 
+- namespace detail
+  - fix hardcoded endpoint list
+  - make sure endpoint can be added
+- namespace link on requests (going nowhere for now)
+- endpoint link on requests (going nowhere for now)
+
+
 - setup air or a auto reloader
 - setup debugger. delve i think?
 

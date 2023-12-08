@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS namespaces (
     id TEXT PRIMARY KEY,
-    slug TEXT NOT NULL,
-    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL UNIQUE,
     created_at TEXT NOT NULL,
     updated_at TEXT DEFAULT ''
 );

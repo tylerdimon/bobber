@@ -7,16 +7,31 @@ import (
 )
 
 type Request struct {
-	ID          string         `json:"id" db:"id"` // uuid.UUID format
-	Method      string         `json:"method" db:"method"`
-	URL         string         `json:"url" db:"url"`
-	Host        string         `json:"host" db:"host"`
-	Path        string         `json:"path" db:"path"`
-	Timestamp   string         `json:"timestamp" db:"timestamp"` // time.Time default format
-	Body        string         `json:"body" db:"body"`
-	Headers     string         `json:"headers" db:"headers"`
-	NamespaceID sql.NullString `json:"namespaceId" db:"namespace_id"`
-	EndpointID  sql.NullString `json:"endpointId" db:"endpoint_id"`
+	ID          string `json:"id" db:"id"` // uuid.UUID format
+	Method      string `json:"method" db:"method"`
+	URL         string `json:"url" db:"url"`
+	Host        string `json:"host" db:"host"`
+	Path        string `json:"path" db:"path"`
+	Timestamp   string `json:"timestamp" db:"timestamp"` // time.Time default format
+	Body        string `json:"body" db:"body"`
+	Headers     string `json:"headers" db:"headers"`
+	NamespaceID string `json:"namespaceId" db:"namespace_id"`
+	EndpointID  string `json:"endpointId" db:"endpoint_id"`
+}
+
+type RequestDetail struct {
+	ID            string         `json:"id" db:"id"` // uuid.UUID format
+	Method        string         `json:"method" db:"method"`
+	URL           string         `json:"url" db:"url"`
+	Host          string         `json:"host" db:"host"`
+	Path          string         `json:"path" db:"path"`
+	Timestamp     string         `json:"timestamp" db:"timestamp"` // time.Time default format
+	Body          string         `json:"body" db:"body"`
+	Headers       string         `json:"headers" db:"headers"`
+	NamespaceID   sql.NullString `json:"namespaceId" db:"namespace_id"`
+	NamespaceName sql.NullString `json:"namespaceName" db:"namespace_name"`
+	EndpointID    sql.NullString `json:"endpointId" db:"endpoint_id"`
+	EndpointPath  sql.NullString `json:"endpointPath" db:"endpoint_path"`
 }
 
 func (r Request) String() string {
@@ -26,8 +41,9 @@ func (r Request) String() string {
 
 type RequestService interface {
 	GetByID(id string) (*Request, error)
-	GetAll() ([]Request, error)
-	Add(request Request) (*Request, error)
+	GetAll() ([]RequestDetail, error)
+	Add(request RequestDetail) (*RequestDetail, error)
 	DeleteByID(id string) (*Request, error)
 	DeleteAll() error
+	Match(method string, path string) (namespaceID, endpointID, response string)
 }

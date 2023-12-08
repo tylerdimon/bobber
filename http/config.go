@@ -144,7 +144,7 @@ func (h *ConfigHandler) addEndpointHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	endpoint := bobber.Endpoint{
-		Path:        r.FormValue("path"),
+		MethodPath:  r.FormValue("path"),
 		Response:    r.FormValue("response"),
 		CreatedAt:   time.Now().String(),
 		NamespaceID: namespaceID,

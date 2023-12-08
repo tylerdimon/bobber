@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS endpoints (
     id TEXT PRIMARY KEY,
-    path TEXT NOT NULL,
+    method_path TEXT NOT NULL UNIQUE,
     response TEXT NOT NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT,

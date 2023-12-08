@@ -14,18 +14,18 @@ var Upgrader = websocket.Upgrader{
 
 type WebsocketService struct {
 	clients   map[bobber.Client]bool
-	broadcast chan *bobber.Request
+	broadcast chan *bobber.RequestDetail
 }
 
 func (s *WebsocketService) Init() {
 	s.clients = make(map[bobber.Client]bool)
-	s.broadcast = make(chan *bobber.Request)
+	s.broadcast = make(chan *bobber.RequestDetail)
 }
 
 func (s *WebsocketService) HandleMessages() {
 	for {
 		request := <-s.broadcast
-		log.Printf("Received a websocket message: %v", request.String())
+		log.Printf("Received a websocket message: %v", request)
 		msg, err := static.GetRequestHTML(request)
 		if err != nil {
 			log.Printf("error getting requst HTML to send over websocket: %v", err)
@@ -43,7 +43,7 @@ func (s *WebsocketService) HandleMessages() {
 	}
 }
 
-func (s *WebsocketService) Broadcast() chan *bobber.Request {
+func (s *WebsocketService) Broadcast() chan *bobber.RequestDetail {
 	return s.broadcast
 }
 
