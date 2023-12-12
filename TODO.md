@@ -1,4 +1,6 @@
 ## TODO
+- headers as slice of tuples?
+- - split method path??
 
 - namespace detail
   - fix hardcoded endpoint list

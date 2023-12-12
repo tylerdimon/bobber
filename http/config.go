@@ -90,6 +90,7 @@ func (h *ConfigHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Re
 func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 	var title string
 	var namespace *bobber.Namespace
+	var endpoints []bobber.Endpoint
 	var err error
 
 	if id == "" {
@@ -100,14 +101,20 @@ func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		endpoints, err = h.EndpointService.GetAllByNamespace(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 
 	pageData := struct {
 		Title     string
 		Namespace *bobber.Namespace
+		Endpoints []bobber.Endpoint
 	}{
 		Title:     title,
 		Namespace: namespace,
+		Endpoints: endpoints,
 	}
 
 	err = static.NamespaceAddTemplate.Execute(w, pageData)
