@@ -6,6 +6,11 @@
     <span><strong>Path:</strong> {{.Path}}</span><br>
     <span><strong>Timestamp:</strong> {{.Timestamp}}</span><br>
     <span><strong>Body:</strong> {{.Body}}</span><br>
-    <span><strong>Headers:</strong> {{.Headers}}</span>
+    <span><strong>Headers:</strong></span><br>
+    <ul>
+        {{ range splitOnNewline .Headers  }}
+            <li>{{ . }}</li>
+        {{ end }}
+    </ul>
 </div>
 {{end}}

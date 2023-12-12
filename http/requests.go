@@ -43,7 +43,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		Path:    r.URL.Path,
 		Host:    r.Host,
 		Body:    body,
-		Headers: strings.Join(headers, ", "),
+		Headers: strings.Join(headers, "\n"),
 	}
 
 	namespaceID, endpointID, response := h.Service.Match(request.Method, request.Path)

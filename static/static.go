@@ -6,6 +6,7 @@ import (
 	"github.com/tylerdimon/bobber"
 	"html/template"
 	"log"
+	"strings"
 )
 
 //go:embed assets
@@ -30,12 +31,18 @@ var EndpointAddTemplate *template.Template
 func ParseHTML() {
 	var err error
 
-	IndexTemplate, err = template.ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath)
+	funcMap := template.FuncMap{
+		"splitOnNewline": func(s string) []string {
+			return strings.Split(s, "\n")
+		},
+	}
+
+	IndexTemplate, err = template.New("base.html").Funcs(funcMap).ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	RequestTemplate, err = template.ParseFS(html, singleRequestPath)
+	RequestTemplate, err = template.New("requests").Funcs(funcMap).ParseFS(html, singleRequestPath)
 	if err != nil {
 		log.Fatal(err)
 	}
