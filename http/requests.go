@@ -1,7 +1,6 @@
 package http
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
@@ -9,7 +8,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 )
 
 type RequestHandler struct {
@@ -30,46 +28,28 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 	}
 	body := string(bodyBytes)
 
-	var headers []string
+	var headers []bobber.Header
 	for name, values := range r.Header {
-		for _, value := range values {
-			headers = append(headers, fmt.Sprintf("%v: %v", name, value))
+		for _, v := range values {
+			headers = append(headers, bobber.Header{
+				Name:  name,
+				Value: v,
+			})
 		}
 	}
 
-	request := bobber.RequestDetail{
+	request := bobber.Request{
 		Method:  r.Method,
 		URL:     r.URL.String(),
 		Path:    r.URL.Path,
 		Host:    r.Host,
-		Body:    body,
-		Headers: strings.Join(headers, "\n"),
+		Body:    &body,
+		Headers: headers,
 	}
 
 	namespaceID, endpointID, response := h.Service.Match(request.Method, request.Path)
-
-	if namespaceID == "" {
-		request.NamespaceID = sql.NullString{
-			String: "",
-			Valid:  false,
-		}
-	} else {
-		request.NamespaceID = sql.NullString{
-			String: namespaceID,
-			Valid:  true,
-		}
-	}
-	if endpointID == "" {
-		request.EndpointID = sql.NullString{
-			String: "",
-			Valid:  false,
-		}
-	} else {
-		request.EndpointID = sql.NullString{
-			String: endpointID,
-			Valid:  true,
-		}
-	}
+	request.NamespaceID = namespaceID
+	request.EndpointID = endpointID
 
 	savedRequest, err := h.Service.Add(request)
 	if err != nil {
@@ -79,10 +59,10 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 
 	h.WebsocketService.Broadcast() <- savedRequest
 
-	if response == "" {
+	if response == nil {
 		w.Write([]byte("Request received"))
 	} else {
-		w.Write([]byte(response))
+		w.Write([]byte(*response))
 	}
 }
 

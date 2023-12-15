@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"encoding/json"
 	"github.com/tylerdimon/bobber"
 	"log"
 	"strings"
@@ -17,44 +18,72 @@ func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
 	return &req, err
 }
 
-func (s *RequestService) GetAll() ([]bobber.RequestDetail, error) {
-	var requestDetails []bobber.RequestDetail
-
+func (s *RequestService) GetAll() ([]bobber.Request, error) {
 	query := `
-	SELECT requests.id,
-       requests.method,
-       requests.url,
-       requests.host,
-       requests.path,
-       requests.timestamp,
-       requests.body,
-       requests.headers,
-       requests.namespace_id,
-       namespaces.name "namespace_name",
-       requests.endpoint_id,
-       endpoints.method_path  "endpoint_path"
-FROM requests
-         LEFT JOIN namespaces on requests.namespace_id = namespaces.id
-         LEFT JOIN endpoints on requests.endpoint_id = endpoints.id
+SELECT r.id, r.method, r.url, r.host, r.path, r.timestamp, r.body,
+	   r.headers, r.namespace_id, r.endpoint_id, n.name
+FROM requests r
+LEFT JOIN namespaces n on r.namespace_id = n.id
 ORDER BY timestamp DESC;`
 
-	err := s.DB.conn.Select(&requestDetails, query)
-
-	return requestDetails, err
-}
-
-func (s *RequestService) Add(request bobber.RequestDetail) (*bobber.RequestDetail, error) {
-	request.ID = s.Gen.UUID().String()
-	request.Timestamp = s.Gen.Now().String()
-	result, err := s.DB.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers, namespace_id, endpoint_id)
-	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers, :namespace_id, :endpoint_id)`, &request)
+	rows, err := s.DB.conn.Query(query)
 	if err != nil {
-		log.Printf("Error saving request to database - Request %v : %v", request, err)
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []bobber.Request
+
+	for rows.Next() {
+		var req bobber.Request
+		var headersJSON string
+
+		err := rows.Scan(&req.ID, &req.Method, &req.URL, &req.Host, &req.Path, &req.Timestamp, &req.Body,
+			&headersJSON, &req.NamespaceID, &req.NamespaceName, &req.EndpointID)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		if headersJSON != "" {
+			err = json.Unmarshal([]byte(headersJSON), &req.Headers)
+			if err != nil {
+				log.Println(err)
+				return nil, err
+			}
+		}
+
+		requests = append(requests, req)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Println(err)
 		return nil, err
 	}
 
-	_, err = result.LastInsertId()
+	return requests, nil
+}
+
+func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
+	request.ID = s.Gen.UUID().String()
+	request.Timestamp = s.Gen.Now().String()
+
+	headersJSON, err := json.Marshal(request.Headers)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	stmt, err := s.DB.conn.Prepare(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers, namespace_id, endpoint_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	if err != nil {
+		log.Printf("Error preparing statement - Request %v : %v", request, err)
+		return nil, err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(request.ID, request.Method, request.URL, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), request.NamespaceID, request.EndpointID)
+	if err != nil {
+		log.Printf("Error saving request to database - Request %v : %v", request, err)
 		return nil, err
 	}
 
@@ -76,43 +105,46 @@ func (s *RequestService) DeleteAll() error {
 	return err
 }
 
-func (s *RequestService) Match(method string, path string) (namespaceID, endpointID, response string) {
+// Match takes in a request method and path in this format /requests/{namespace}/{endpoint}
+// and returns a matching namespace, endpoint, and response if exists
+func (s *RequestService) Match(method string, path string) (namespaceID, endpointID, response *string) {
 	log.Printf("Matching request with method %s and path %s", method, path)
 	parts := strings.SplitN(path, "/", 4)
 
-	// parts[0] is throwaway value, will always be empty string with leading slash
-	// parts[1] is always going to be requests
-	// parts[2] might be a namespace, but only if it matches
-	possibleNamespace := parts[2]
-	namespaceID = s.matchNamespace(possibleNamespace)
-	if namespaceID == "" {
+	namespaceID = s.matchNamespace(parts[2])
+	if namespaceID == nil {
 		log.Printf("Request with method %s and path %s did not match a namespace", method, path)
-		// request is unmatched
 		return
 	}
 
-	// parts[2] is the rest of the path without leading slash
-	endpointID, response = s.matchEndpoint(namespaceID, method, "/"+parts[3])
+	endpointID, response = s.matchEndpoint(*namespaceID, method, "/"+parts[3])
 	log.Printf("Request with method %s and path %s matched the following namespace %s and endpoint %s", method, path, namespaceID, endpointID)
 	return
 }
 
-func (s *RequestService) matchNamespace(namespace string) (namespaceID string) {
+func (s *RequestService) matchNamespace(namespace string) (namespaceID *string) {
 	log.Printf("Looking for match for namespace %s", namespace)
 
 	var id string
 	err := s.DB.conn.Get(&id, " SELECT id FROM namespaces WHERE slug = ?", namespace)
 	if err != nil {
 		log.Print(err)
+		return nil
 	}
-	return id
+	return &id
 }
 
-func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpointID string, response string) {
+func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpointID, response *string) {
 	var endpoint bobber.Endpoint
-	err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method_path = ?", namespaceID, method+" "+path)
+	err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method = ? AND PATH = ?", namespaceID, method, path)
 	if err != nil {
+		// TODO make sure this catches when there is no match
 		log.Print(err)
+		err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method = ? AND PATH = '*'", namespaceID, method)
+		if err != nil {
+			log.Print(err)
+			return nil, nil
+		}
 	}
-	return endpoint.ID, endpoint.Response
+	return &endpoint.ID, &endpoint.Response
 }

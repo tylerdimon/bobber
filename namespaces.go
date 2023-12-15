@@ -1,11 +1,11 @@
 package bobber
 
 type Namespace struct {
-	ID        string `json:"id" db:"id"` // uuid.UUID format
-	Slug      string `json:"slug" db:"slug"`
-	Name      string `json:"name" db:"name"`
-	CreatedAt string `json:"createdAt" db:"created_at"` // time.Time default format
-	UpdatedAt string `json:"updatedAt" db:"updated_at"` // time.Time default format
+	ID        string `db:"id"`
+	Slug      string `db:"slug"`
+	Name      string `db:"name"`
+	CreatedAt string `db:"created_at"`
+	UpdatedAt string `db:"updated_at"`
 }
 
 type NamespaceService interface {
@@ -13,7 +13,4 @@ type NamespaceService interface {
 	GetAll() ([]*Namespace, error)
 	Add(request Namespace) (*Namespace, error)
 	Update(request Namespace) (Namespace, error)
-	//DeleteByID(id string) (Namespace, error)
-	//DeleteByID(id string) (Namespace, error)
-	//DeleteAll() error
 }

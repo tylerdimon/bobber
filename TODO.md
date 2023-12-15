@@ -1,43 +1,13 @@
 ## TODO
-- headers as slice of tuples?
-- - split method path??
-
-- namespace detail
-  - fix hardcoded endpoint list
-  - make sure endpoint can be added
-- namespace link on requests (going nowhere for now)
-- endpoint link on requests (going nowhere for now)
-
-
+- remove sqlx
 - setup air or a auto reloader
 - setup debugger. delve i think?
-
-### TESTS
-
-- http
-  - request
-  - endpoint
-  - namespace
-- sqlite
-  - request
-  - endpoint
-  - namespace
-
-### FIX
-
-- log the errors
-- clean up error handling
-- add tests
+- logging
+- error handling
 - default sorting on queries
 - split config http handler up
-
-### NEW
-
-- add namespace & endpoint logic to request handler
-- update endpoint
-- delete namespace
-- delete endpoint
-- add default response to namespace
+- TESTS!!!
+- finish CRUD for everything
 
 - think about routing in general
     - listener /{apiname}/{endpoint}

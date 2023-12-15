@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS namespaces (
     slug TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL UNIQUE,
     created_at TEXT NOT NULL,
-    updated_at TEXT DEFAULT ''
+    updated_at TEXT
 );

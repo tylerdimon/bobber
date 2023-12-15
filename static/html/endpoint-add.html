@@ -1,6 +1,17 @@
 {{define "content"}}
 <h2>Add New Endpoint</h2>
 <form action="/config/namespace/{{.NamespaceID}}/endpoint" method="post">
+    <label for="method">Method:</label><br>
+    <select id="method" name="method" required>
+        <option>GET</option>
+        <option>POST</option>
+        <option>PUT</option>
+        <option>PATCH</option>
+        <option>DELETE</option>
+        <option>HEAD</option>
+        <option>*</option>
+    </select>
+
     <label for="path">Path:</label><br>
     <input type="text" id="path" name="path" required><br>
 

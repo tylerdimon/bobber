@@ -8,8 +8,8 @@
     <span><strong>Body:</strong> {{.Body}}</span><br>
     <span><strong>Headers:</strong></span><br>
     <ul>
-        {{ range splitOnNewline .Headers  }}
-            <li>{{ . }}</li>
+        {{ range .Headers  }}
+            <li><strong>{{ .Name }}</strong>: {{ .Value }}</li>
         {{ end }}
     </ul>
 </div>

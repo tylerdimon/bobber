@@ -63,7 +63,7 @@ func ParseHTML() {
 	}
 }
 
-func GetRequestHTML(request *bobber.RequestDetail) ([]byte, error) {
+func GetRequestHTML(request *bobber.Request) ([]byte, error) {
 	var buf bytes.Buffer
 	err := RequestTemplate.ExecuteTemplate(&buf, "request", request)
 	if err != nil {

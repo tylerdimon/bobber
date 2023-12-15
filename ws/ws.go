@@ -14,12 +14,12 @@ var Upgrader = websocket.Upgrader{
 
 type WebsocketService struct {
 	clients   map[bobber.Client]bool
-	broadcast chan *bobber.RequestDetail
+	broadcast chan *bobber.Request
 }
 
 func (s *WebsocketService) Init() {
 	s.clients = make(map[bobber.Client]bool)
-	s.broadcast = make(chan *bobber.RequestDetail)
+	s.broadcast = make(chan *bobber.Request)
 }
 
 func (s *WebsocketService) HandleMessages() {
@@ -43,7 +43,7 @@ func (s *WebsocketService) HandleMessages() {
 	}
 }
 
-func (s *WebsocketService) Broadcast() chan *bobber.RequestDetail {
+func (s *WebsocketService) Broadcast() chan *bobber.Request {
 	return s.broadcast
 }
 
