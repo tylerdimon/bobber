@@ -56,10 +56,14 @@ func (s *Server) Init() {
 
 	static.ParseHTML()
 
-	configHandler := &ConfigHandler{}
+	configHandler := &NamespaceHandler{}
 	configHandler.NamespaceService = s.NamespaceService
 	configHandler.EndpointService = s.EndpointService
-	configHandler.RegisterConfigRoutes(s.router)
+	configHandler.RegisterNamespaceRoutes(s.router)
+
+	endpointHandler := &EndpointHandler{}
+	endpointHandler.EndpointService = s.EndpointService
+	endpointHandler.RegisterEndpointRoutes(s.router)
 
 	requestHandler := &RequestHandler{}
 	requestHandler.Service = s.RequestService
