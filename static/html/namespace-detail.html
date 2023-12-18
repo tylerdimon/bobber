@@ -2,7 +2,7 @@
 <h2>{{.Title}}</h2>
 
 {{if .Namespace}}
-<form action="/config/namespace/{{.Namespace.ID}}" method="post">
+<form action="/namespace/{{.Namespace.ID}}" method="post">
     <input type="hidden" name="_method" value="PUT" />
 
     <label for="slug">Slug:</label><br>
@@ -14,7 +14,7 @@
     <input type="submit" value="Save">
 </form>
 {{else}}
-<form action="/config/namespace" method="post">
+<form action="/namespace" method="post">
     <label for="slug">Slug:</label><br>
     <input type="text" id="slug" name="slug" required><br>
 
@@ -25,6 +25,7 @@
 </form>
 {{end}}
 
+{{if .Namespace }}
 <h3>Endpoints</h3>
 <a href="/config/namespace/{{.Namespace.ID}}/endpoint">Add</a>
 <ul id="endpoints">
@@ -32,4 +33,5 @@
     <li>{{.Method}} {{.Path}} | <a href="#">View Endpoint</a> | <a href="/config/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Edit</a></li>
     {{end}}
 </ul>
+{{end}}
 {{end}}

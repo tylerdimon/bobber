@@ -14,4 +14,5 @@ type NamespaceService interface {
 	GetAll() ([]*Namespace, error)
 	Add(request Namespace) (*Namespace, error)
 	Update(request Namespace) (Namespace, error)
+	DeleteById(id string) error
 }

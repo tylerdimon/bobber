@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
 	"log"
@@ -111,4 +112,47 @@ func (s *NamespaceService) Update(namespace bobber.Namespace) (bobber.Namespace,
 	namespace.UpdatedAt = time.Now().String()
 	_, err := s.DB.conn.NamedExec(`UPDATE namespaces SET slug = :slug, name = :name, updated_at = :updated_at WHERE id = :id`, &namespace)
 	return namespace, err
+}
+
+func (s *NamespaceService) DeleteById(id string) error {
+	tx, err := s.DB.conn.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	log.Printf("Deleting endpoints for namespace %s", id)
+	if err = executeStmt(tx, "DELETE FROM endpoints WHERE namespace_id = $1", id); err != nil {
+		log.Println(err)
+		return fmt.Errorf("failed to delete from endpoints: %w", err)
+	}
+
+	log.Printf("Deleting namespace %s", id)
+	if err = executeStmt(tx, "DELETE FROM namespaces WHERE id = $1", id); err != nil {
+		log.Println(err)
+		return fmt.Errorf("failed to delete from namespaces: %w", err)
+	}
+
+	return nil
+}
+
+func executeStmt(tx *sql.Tx, query string, args ...interface{}) error {
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(args...)
+	return err
 }

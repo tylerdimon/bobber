@@ -18,7 +18,7 @@ var html embed.FS
 const baseTemplatePath = "html/base.html"
 const requestsIndexPath = "html/index.html"
 const singleRequestPath = "html/request.html"
-const configPath = "html/config.html"
+const configPath = "html/namespaces.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
 

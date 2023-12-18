@@ -5,7 +5,6 @@
 - logging
 - error handling
 - default sorting on queries
-- split config http handler up
 - TESTS!!!
 - finish CRUD for everything
 

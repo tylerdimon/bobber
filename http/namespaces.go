@@ -14,12 +14,15 @@ type NamespaceHandler struct {
 }
 
 func (h *NamespaceHandler) RegisterNamespaceRoutes(r *mux.Router) {
-	r.HandleFunc("/config", h.configIndexHandler)
-	r.HandleFunc("/config/namespace", h.namespaceDetailHandler)
-	r.HandleFunc("/config/namespace/{id}", h.namespaceDetailHandler)
+	r.HandleFunc("/namespace/{id}/delete", h.deleteByIdHandler).Methods("GET")
+	r.HandleFunc("/namespace/{id}", h.detailHandler).Methods("GET")
+	r.HandleFunc("/namespace/{id}", h.updateHandler).Methods("PUT")
+	r.HandleFunc("/namespace", h.detailHandler).Methods("GET")
+	r.HandleFunc("/namespace", h.AddHandler).Methods("POST")
+	r.HandleFunc("/config", h.getAllHandler)
 }
 
-func (h *NamespaceHandler) configIndexHandler(w http.ResponseWriter, r *http.Request) {
+func (h *NamespaceHandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	namespaces, err := h.NamespaceService.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -40,14 +43,69 @@ func (h *NamespaceHandler) configIndexHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (h *NamespaceHandler) namespaceDetailHandler(w http.ResponseWriter, r *http.Request) {
+func (h *NamespaceHandler) detailHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
 
-	if r.Method == "GET" {
-		h.serveNamespaceDetail(w, id)
+	var title string
+	var namespace *bobber.Namespace
+	endpoints := make([]bobber.Endpoint, 0)
+	var err error
+
+	if id == "" {
+		title = "Add Namespace"
+	} else {
+		title = "Edit Namespace"
+		namespace, err = h.NamespaceService.GetById(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		endpoints = namespace.Endpoints
+	}
+
+	pageData := struct {
+		Title     string
+		Namespace *bobber.Namespace
+		Endpoints []bobber.Endpoint
+	}{
+		Title:     title,
+		Namespace: namespace,
+		Endpoints: endpoints,
+	}
+
+	err = static.NamespaceAddTemplate.Execute(w, pageData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (h *NamespaceHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
 		return
 	}
+
+	namespace := bobber.Namespace{
+		Slug: r.FormValue("slug"),
+		Name: r.FormValue("name"),
+	}
+
+	added, err := h.NamespaceService.Add(namespace)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error adding to database: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Namespace Added: %+v", added)
+	http.Redirect(w, r, "/config", http.StatusSeeOther)
+
+}
+
+func (h *NamespaceHandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
 	err := r.ParseForm()
 	if err != nil {
@@ -60,58 +118,30 @@ func (h *NamespaceHandler) namespaceDetailHandler(w http.ResponseWriter, r *http
 		Name: r.FormValue("name"),
 	}
 
-	if r.Method == "PUT" {
-		namespace.ID = id
-		updated, err := h.NamespaceService.Update(namespace)
-		if err != nil {
-			http.Error(w, "Error updating database", http.StatusInternalServerError)
-			return
-		}
-
-		log.Printf("Namespace Updated: %+v", updated)
-
-	} else if r.Method == "POST" {
-		added, err := h.NamespaceService.Add(namespace)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error adding to database: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		log.Printf("Namespace Added: %+v", added)
+	namespace.ID = id
+	updated, err := h.NamespaceService.Update(namespace)
+	if err != nil {
+		http.Error(w, "Error updating database", http.StatusInternalServerError)
+		return
 	}
 
+	log.Printf("Namespace Updated: %+v", updated)
+
+	log.Printf("Namespace Added: %+v", updated)
 	http.Redirect(w, r, "/config", http.StatusSeeOther)
 
 }
 
-func (h *NamespaceHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
-	var title string
-	var namespace *bobber.Namespace
-	var err error
+func (h *NamespaceHandler) deleteByIdHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	log.Printf("Handling delete request for Namespace %s", id)
 
-	if id == "" {
-		title = "Add Namespace"
-	} else {
-		title = "Edit Namespace"
-		namespace, err = h.NamespaceService.GetById(id)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	pageData := struct {
-		Title     string
-		Namespace *bobber.Namespace
-		Endpoints []bobber.Endpoint
-	}{
-		Title:     title,
-		Namespace: namespace,
-		Endpoints: namespace.Endpoints,
-	}
-
-	err = static.NamespaceAddTemplate.Execute(w, pageData)
+	err := h.NamespaceService.DeleteById(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
+		return
 	}
+
+	http.Redirect(w, r, "/config", http.StatusSeeOther)
 }
