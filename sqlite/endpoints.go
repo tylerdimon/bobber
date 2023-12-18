@@ -19,16 +19,6 @@ func (s *EndpointService) GetAll() ([]bobber.Endpoint, error) {
 	return spaces, err
 }
 
-func (s *EndpointService) GetAllByNamespace(namespaceID string) ([]bobber.Endpoint, error) {
-	var endpoints []bobber.Endpoint
-	err := s.DB.conn.Select(&endpoints, "SELECT * FROM endpoints WHERE namespace_id = ? ORDER BY path", namespaceID)
-	if err != nil {
-		log.Println(err)
-		return nil, err
-	}
-	return endpoints, err
-}
-
 func (s *EndpointService) Add(endpoint bobber.Endpoint) (*bobber.Endpoint, error) {
 	endpoint.ID = uuid.New().String()
 	endpoint.CreatedAt = time.Now().String()

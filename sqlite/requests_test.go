@@ -53,7 +53,7 @@ func populateDB(db *DB) error {
 	return err
 }
 
-func TestGetByID(t *testing.T) {
+func TestGetById(t *testing.T) {
 	db, err := initDB()
 	require.Nil(t, err)
 	defer db.Close()
@@ -95,13 +95,13 @@ func TestGetByID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.GetByID(tt.id)
+			got, err := service.GetById(tt.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetByID() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetById() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !tt.wantErr && *got != tt.expected {
-				t.Errorf("GetByID() got = %v, want %v", got, tt.expected)
+				t.Errorf("GetById() got = %v, want %v", got, tt.expected)
 			}
 		})
 	}
@@ -172,4 +172,4 @@ func TestDeleteAll(t *testing.T) {
 
 //Add
 
-//DeleteByID
+//DeleteById

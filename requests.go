@@ -22,10 +22,10 @@ type Header struct {
 }
 
 type RequestService interface {
-	GetByID(id string) (*Request, error)
+	GetById(id string) (*Request, error)
 	GetAll() ([]Request, error)
 	Add(request Request) (*Request, error)
-	DeleteByID(id string) (*Request, error)
+	DeleteById(id string) (*Request, error)
 	DeleteAll() error
 	Match(method string, path string) (namespaceID, endpointID, response *string)
 }

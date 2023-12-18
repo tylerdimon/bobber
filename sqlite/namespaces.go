@@ -12,18 +12,52 @@ type NamespaceService struct {
 	DB *DB
 }
 
-func (s *NamespaceService) GetByID(id string) (*bobber.Namespace, error) {
-	var namespace bobber.Namespace
+func (s *NamespaceService) GetById(id string) (*bobber.Namespace, error) {
+	var ns bobber.Namespace
+	ns.ID = id
 	var updatedAt sql.NullString
 
 	query := `
-SELECT id, slug, name, created_at, updated_at FROM namespaces ORDER BY name
+SELECT slug, name, created_at, updated_at FROM namespaces ORDER BY name
 `
+	err := s.DB.conn.QueryRow(query, id).Scan(&ns.Slug, &ns.Name, &ns.CreatedAt, &updatedAt)
+	ns.UpdatedAt = Unwrap(updatedAt)
 
-	err := s.DB.conn.QueryRow(query, id).Scan(&namespace.ID, &namespace.Slug, &namespace.Name, &namespace.CreatedAt, &updatedAt)
-	namespace.UpdatedAt = Unwrap(updatedAt)
+	endpoints, err := s.getEndpointsByNamespaceId(id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	ns.Endpoints = endpoints
 
-	return &namespace, err
+	return &ns, err
+}
+
+func (s *NamespaceService) getEndpointsByNamespaceId(id string) ([]bobber.Endpoint, error) {
+	query := `SELECT id, method, path, response, created_at, updated_at FROM endpoints WHERE namespace_id = ? ORDER BY path`
+	rows, err := s.DB.conn.Query(query, id)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var endpoints []bobber.Endpoint
+	for rows.Next() {
+		var e bobber.Endpoint
+		var updatedAt sql.NullString
+
+		err := rows.Scan(&e.ID, &e.Method, &e.Path, &e.Response, &e.CreatedAt, &updatedAt)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		e.UpdatedAt = Unwrap(updatedAt)
+
+		endpoints = append(endpoints, e)
+	}
+	return endpoints, nil
 }
 
 func (s *NamespaceService) GetAll() ([]*bobber.Namespace, error) {

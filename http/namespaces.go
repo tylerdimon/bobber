@@ -11,7 +11,6 @@ import (
 
 type NamespaceHandler struct {
 	NamespaceService bobber.NamespaceService
-	EndpointService  bobber.EndpointService
 }
 
 func (h *NamespaceHandler) RegisterNamespaceRoutes(r *mux.Router) {
@@ -88,19 +87,13 @@ func (h *NamespaceHandler) namespaceDetailHandler(w http.ResponseWriter, r *http
 func (h *NamespaceHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 	var title string
 	var namespace *bobber.Namespace
-	var endpoints []bobber.Endpoint
 	var err error
 
 	if id == "" {
 		title = "Add Namespace"
 	} else {
 		title = "Edit Namespace"
-		namespace, err = h.NamespaceService.GetByID(id)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		endpoints, err = h.EndpointService.GetAllByNamespace(id)
+		namespace, err = h.NamespaceService.GetById(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -114,7 +107,7 @@ func (h *NamespaceHandler) serveNamespaceDetail(w http.ResponseWriter, id string
 	}{
 		Title:     title,
 		Namespace: namespace,
-		Endpoints: endpoints,
+		Endpoints: namespace.Endpoints,
 	}
 
 	err = static.NamespaceAddTemplate.Execute(w, pageData)

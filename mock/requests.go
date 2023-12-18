@@ -8,11 +8,11 @@ type RequestService struct {
 	Requests []bobber.Request
 	Gen      bobber.Generator
 
-	GetByIDCalled    int
+	GetByIdCalled    int
 	GetAllCalled     int
 	AddCalled        int
 	UpdateCalled     int
-	DeleteByIDCalled int
+	DeleteByIdCalled int
 	DeleteAllCalled  int
 }
 
@@ -25,8 +25,8 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	return nil, nil
 }
 
-func (s *RequestService) GetByID(id string) (*bobber.Request, error) {
-	s.GetByIDCalled = s.GetByIDCalled + 1
+func (s *RequestService) GetById(id string) (*bobber.Request, error) {
+	s.GetByIdCalled = s.GetByIdCalled + 1
 	return nil, nil
 }
 
@@ -40,8 +40,8 @@ func (s *RequestService) Update(request bobber.Request) (bobber.Request, error) 
 	return request, nil
 }
 
-func (s *RequestService) DeleteByID(id string) (*bobber.Request, error) {
-	s.DeleteByIDCalled = s.DeleteByIDCalled + 1
+func (s *RequestService) DeleteById(id string) (*bobber.Request, error) {
+	s.DeleteByIdCalled = s.DeleteByIdCalled + 1
 	return nil, nil
 }
 

@@ -58,7 +58,6 @@ func (s *Server) Init() {
 
 	configHandler := &NamespaceHandler{}
 	configHandler.NamespaceService = s.NamespaceService
-	configHandler.EndpointService = s.EndpointService
 	configHandler.RegisterNamespaceRoutes(s.router)
 
 	endpointHandler := &EndpointHandler{}
