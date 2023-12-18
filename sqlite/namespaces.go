@@ -1,8 +1,10 @@
 package sqlite
 
 import (
+	"database/sql"
 	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
+	"log"
 	"time"
 )
 
@@ -12,15 +14,45 @@ type NamespaceService struct {
 
 func (s *NamespaceService) GetByID(id string) (*bobber.Namespace, error) {
 	var namespace bobber.Namespace
-	err := s.DB.conn.Get(&namespace, "SELECT * FROM namespaces WHERE id = ?", id)
+	var updatedAt sql.NullString
+
+	query := `
+SELECT id, slug, name, created_at, updated_at FROM namespaces ORDER BY name
+`
+
+	err := s.DB.conn.QueryRow(query, id).Scan(&namespace.ID, &namespace.Slug, &namespace.Name, &namespace.CreatedAt, &updatedAt)
+	namespace.UpdatedAt = Unwrap(updatedAt)
+
 	return &namespace, err
 }
 
 func (s *NamespaceService) GetAll() ([]*bobber.Namespace, error) {
-	// TODO alphabetical by name ordering
+	query := `
+SELECT id, slug, name, created_at, updated_at FROM namespaces ORDER BY name
+`
+	rows, err := s.DB.conn.Query(query)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
 	var spaces []*bobber.Namespace
-	err := s.DB.conn.Select(&spaces, "SELECT * FROM namespaces")
-	return spaces, err
+	for rows.Next() {
+		var ns bobber.Namespace
+		var updatedAt sql.NullString
+
+		err := rows.Scan(&ns.ID, &ns.Slug, &ns.Name, &ns.CreatedAt, &updatedAt)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+
+		ns.UpdatedAt = Unwrap(updatedAt)
+
+		spaces = append(spaces, &ns)
+	}
+	return spaces, nil
 }
 
 func (s *NamespaceService) Add(namespace bobber.Namespace) (*bobber.Namespace, error) {

@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"database/sql"
 	"embed"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -124,4 +125,12 @@ func (db *DB) Close() error {
 		return db.conn.Close()
 	}
 	return nil
+}
+
+func Unwrap(str sql.NullString) string {
+	if str.Valid {
+		return str.String
+	} else {
+		return ""
+	}
 }

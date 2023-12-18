@@ -100,10 +100,12 @@ func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 		namespace, err = h.NamespaceService.GetByID(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		endpoints, err = h.EndpointService.GetAllByNamespace(id)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -121,7 +123,6 @@ func (h *ConfigHandler) serveNamespaceDetail(w http.ResponseWriter, id string) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	return
 }
 
 func (h *ConfigHandler) addEndpointHandler(w http.ResponseWriter, r *http.Request) {
