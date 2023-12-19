@@ -23,7 +23,7 @@ type Header struct {
 
 type RequestService interface {
 	GetById(id string) (*Request, error)
-	GetAll() ([]Request, error)
+	GetAll() ([]*Request, error)
 	Add(request Request) (*Request, error)
 	DeleteById(id string) (*Request, error)
 	DeleteAll() error

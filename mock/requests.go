@@ -5,7 +5,7 @@ import (
 )
 
 type RequestService struct {
-	Requests []bobber.Request
+	Requests []*bobber.Request
 	Gen      bobber.Generator
 
 	GetByIdCalled    int
@@ -25,7 +25,7 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	request.Timestamp = s.Gen.Now().String()
 
 	s.AddCalled = s.AddCalled + 1
-	s.Requests = append(s.Requests, request)
+	s.Requests = append(s.Requests, &request)
 	return nil, nil
 }
 
@@ -34,7 +34,7 @@ func (s *RequestService) GetById(id string) (*bobber.Request, error) {
 	return nil, nil
 }
 
-func (s *RequestService) GetAll() ([]bobber.Request, error) {
+func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	s.GetAllCalled = s.GetAllCalled + 1
 	return s.Requests, nil
 }

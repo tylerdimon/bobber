@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/tylerdimon/bobber"
 	"log"
@@ -12,19 +13,63 @@ type RequestService struct {
 	Gen bobber.Generator
 }
 
-func (s *RequestService) GetById(id string) (*bobber.Request, error) {
-	var req bobber.Request
-	err := s.DB.conn.Get(&req, "SELECT * FROM requests WHERE id = ?", id)
-	return &req, err
+type Scannable interface {
+	Scan(dest ...any) error
 }
 
-func (s *RequestService) GetAll() ([]bobber.Request, error) {
+func scan(rows Scannable) (*bobber.Request, error) {
+	var r bobber.Request
+	var headersJSON string
+	var namespaceId sql.NullString
+	var namespaceName sql.NullString
+	var endpointID sql.NullString
+
+	err := rows.Scan(&r.ID, &r.Method, &r.URL, &r.Host, &r.Path, &r.Timestamp, &r.Body,
+		&headersJSON, &namespaceId, &endpointID, &namespaceName)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	if headersJSON != "" {
+		err = json.Unmarshal([]byte(headersJSON), &r.Headers)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+	}
+
+	r.NamespaceID = Unwrap(namespaceId)
+	r.NamespaceName = Unwrap(namespaceName)
+	r.EndpointID = Unwrap(endpointID)
+
+	return &r, nil
+}
+
+func (s *RequestService) GetById(id string) (*bobber.Request, error) {
+	query := `
+SELECT r.id, r.method, r.url, r.host, r.path, r.timestamp, r.body,
+	   r.headers, r.namespace_id, r.endpoint_id, n.name 
+FROM requests r 
+LEFT JOIN namespaces n on r.namespace_id = n.id 
+WHERE r.id = ?;`
+
+	r, err := scan(s.DB.conn.QueryRow(query, id))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.url, r.host, r.path, r.timestamp, r.body,
 	   r.headers, r.namespace_id, r.endpoint_id, n.name
 FROM requests r
 LEFT JOIN namespaces n on r.namespace_id = n.id
-ORDER BY timestamp DESC;`
+ORDER BY r.timestamp DESC;`
 
 	rows, err := s.DB.conn.Query(query)
 	if err != nil {
@@ -33,28 +78,14 @@ ORDER BY timestamp DESC;`
 	}
 	defer rows.Close()
 
-	var requests []bobber.Request
-
+	var requests []*bobber.Request
 	for rows.Next() {
-		var req bobber.Request
-		var headersJSON string
-
-		err := rows.Scan(&req.ID, &req.Method, &req.URL, &req.Host, &req.Path, &req.Timestamp, &req.Body,
-			&headersJSON, &req.NamespaceID, &req.NamespaceName, &req.EndpointID)
+		r, err := scan(rows)
 		if err != nil {
 			log.Println(err)
 			return nil, err
 		}
-
-		if headersJSON != "" {
-			err = json.Unmarshal([]byte(headersJSON), &req.Headers)
-			if err != nil {
-				log.Println(err)
-				return nil, err
-			}
-		}
-
-		requests = append(requests, req)
+		requests = append(requests, r)
 	}
 
 	if err = rows.Err(); err != nil {

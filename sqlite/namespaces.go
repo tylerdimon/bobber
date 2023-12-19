@@ -18,9 +18,8 @@ func (s *NamespaceService) GetById(id string) (*bobber.Namespace, error) {
 	ns.ID = id
 	var updatedAt sql.NullString
 
-	query := `
-SELECT slug, name, created_at, updated_at FROM namespaces ORDER BY name
-`
+	query := `SELECT slug, name, created_at, updated_at FROM namespaces ORDER BY name`
+
 	err := s.DB.conn.QueryRow(query, id).Scan(&ns.Slug, &ns.Name, &ns.CreatedAt, &updatedAt)
 	ns.UpdatedAt = Unwrap(updatedAt)
 
