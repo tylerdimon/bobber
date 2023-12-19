@@ -43,7 +43,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		URL:     r.URL.String(),
 		Path:    r.URL.Path,
 		Host:    r.Host,
-		Body:    &body,
+		Body:    body,
 		Headers: headers,
 	}
 
@@ -59,10 +59,10 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 
 	h.WebsocketService.Broadcast() <- savedRequest
 
-	if response == nil {
+	if response == "" {
 		w.Write([]byte("Request received"))
 	} else {
-		w.Write([]byte(*response))
+		w.Write([]byte(response))
 	}
 }
 

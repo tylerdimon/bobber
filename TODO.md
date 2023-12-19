@@ -1,12 +1,18 @@
 ## TODO
-- remove sqlx
-- setup air or a auto reloader
-- setup debugger. delve i think?
-- logging
-- error handling
-- default sorting on queries
-- TESTS!!!
-- finish CRUD for everything
+
+- namespaces
+  - logging
+  - error handling
+  - default sorting on queries
+  - remove sqlx usage
+  - add tests
+    - http
+    - db
+- requests
+- endpoints
+
+- setup auto reload. air? modd?
+- setup debugger. delve?
 
 - think about routing in general
     - listener /{apiname}/{endpoint}

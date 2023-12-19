@@ -16,6 +16,10 @@ type RequestService struct {
 	DeleteAllCalled  int
 }
 
+func (s *RequestService) Match(method string, path string) (namespaceID, endpointID, response string) {
+	return "", "", ""
+}
+
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	request.ID = s.Gen.UUID().String()
 	request.Timestamp = s.Gen.Now().String()

@@ -107,34 +107,34 @@ func (s *RequestService) DeleteAll() error {
 
 // Match takes in a request method and path in this format /requests/{namespace}/{endpoint}
 // and returns a matching namespace, endpoint, and response if exists
-func (s *RequestService) Match(method string, path string) (namespaceID, endpointID, response *string) {
+func (s *RequestService) Match(method string, path string) (namespaceID, endpointID, response string) {
 	log.Printf("Matching request with method %s and path %s", method, path)
 	parts := strings.SplitN(path, "/", 4)
 
 	namespaceID = s.matchNamespace(parts[2])
-	if namespaceID == nil {
+	if namespaceID == "" {
 		log.Printf("Request with method %s and path %s did not match a namespace", method, path)
 		return
 	}
 
-	endpointID, response = s.matchEndpoint(*namespaceID, method, "/"+parts[3])
+	endpointID, response = s.matchEndpoint(namespaceID, method, "/"+parts[3])
 	log.Printf("Request with method %s and path %s matched the following namespace %s and endpoint %s", method, path, namespaceID, endpointID)
 	return
 }
 
-func (s *RequestService) matchNamespace(namespace string) (namespaceID *string) {
-	log.Printf("Looking for match for namespace %s", namespace)
+func (s *RequestService) matchNamespace(slug string) (namespaceID string) {
+	log.Printf("Looking for namespace match for slug %s", slug)
 
 	var id string
-	err := s.DB.conn.Get(&id, " SELECT id FROM namespaces WHERE slug = ?", namespace)
+	err := s.DB.conn.Get(&id, " SELECT id FROM namespaces WHERE slug = ?", slug)
 	if err != nil {
 		log.Print(err)
-		return nil
+		return ""
 	}
-	return &id
+	return id
 }
 
-func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpointID, response *string) {
+func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpointID, response string) {
 	var endpoint bobber.Endpoint
 	err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method = ? AND PATH = ?", namespaceID, method, path)
 	if err != nil {
@@ -143,8 +143,8 @@ func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpoi
 		err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method = ? AND PATH = '*'", namespaceID, method)
 		if err != nil {
 			log.Print(err)
-			return nil, nil
+			return "", ""
 		}
 	}
-	return &endpoint.ID, &endpoint.Response
+	return endpoint.ID, endpoint.Response
 }

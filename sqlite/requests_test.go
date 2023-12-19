@@ -6,23 +6,39 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
+	"log"
 	"testing"
 )
 
-func initDB() (*DB, error) {
+func initDB() *DB {
 	db := &DB{
 		DSN: ":memory:",
 	}
 	db.ctx, db.cancel = context.WithCancel(context.Background())
 	err := db.Open()
 	if err != nil {
-		return nil, err
+		db.Close()
+		log.Fatal(err)
 	}
-	return db, nil
+	return db
 }
 
-func populateDB(db *DB) error {
-	request := bobber.Request{
+func populateDB(db *DB) {
+	tx, err := db.conn.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tx.Commit()
+
+	stmt, err := tx.Prepare(`
+		INSERT INTO requests (id, method, url, host, path, timestamp, body, headers) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+
+	request1 := bobber.Request{
 		ID:        mock.UUIDString,
 		Timestamp: mock.TimestampString,
 		Method:    "GET",
@@ -30,12 +46,6 @@ func populateDB(db *DB) error {
 		Host:      "google.com",
 		Path:      "",
 		Body:      "",
-		Headers:   "",
-	}
-	_, err := db.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
-	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request)
-	if err != nil {
-		return err
 	}
 
 	request2 := bobber.Request{
@@ -46,20 +56,25 @@ func populateDB(db *DB) error {
 		Host:      "example.com",
 		Path:      "",
 		Body:      "some body text",
-		Headers:   "",
+		Headers:   []bobber.Header{},
 	}
-	_, err = db.conn.NamedExec(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers)
-	                               VALUES (:id, :method, :url, :host, :path, :timestamp, :body, :headers)`, &request2)
-	return err
+
+	_, err = stmt.Exec(request1.ID, request1.Timestamp, request1.Method, request1.URL, request1.Host, request1.Path, request1.Body, "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = stmt.Exec(request2.ID, request2.Timestamp, request2.Method, request2.URL, request2.Host, request2.Path, request2.Body, "")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func TestGetById(t *testing.T) {
-	db, err := initDB()
-	require.Nil(t, err)
+	db := initDB()
 	defer db.Close()
 
-	err = populateDB(db)
-	require.Nil(t, err)
+	populateDB(db)
 
 	service := &RequestService{
 		DB: db,
@@ -82,7 +97,7 @@ func TestGetById(t *testing.T) {
 				Path:      "",
 				Timestamp: mock.TimestampString,
 				Body:      "",
-				Headers:   "",
+				Headers:   []bobber.Header{},
 			},
 			wantErr: false,
 		},
@@ -96,24 +111,21 @@ func TestGetById(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := service.GetById(tt.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetById() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr && *got != tt.expected {
-				t.Errorf("GetById() got = %v, want %v", got, tt.expected)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.expected, *got)
 			}
 		})
 	}
 }
 
 func TestGetAll(t *testing.T) {
-	db, err := initDB()
-	require.Nil(t, err)
+	db := initDB()
 	defer db.Close()
 
-	err = populateDB(db)
-	require.Nil(t, err)
+	populateDB(db)
 
 	service := &RequestService{
 		DB: db,
@@ -128,7 +140,7 @@ func TestGetAll(t *testing.T) {
 			Path:      "",
 			Timestamp: "2009-11-10 23:00:01 +0000 UTC",
 			Body:      "some body text",
-			Headers:   "",
+			Headers:   []bobber.Header{},
 		},
 		{
 			ID:        mock.UUIDString,
@@ -138,7 +150,7 @@ func TestGetAll(t *testing.T) {
 			Path:      "",
 			Timestamp: mock.TimestampString,
 			Body:      "",
-			Headers:   "",
+			Headers:   []bobber.Header{},
 		},
 	}
 
@@ -150,18 +162,16 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestDeleteAll(t *testing.T) {
-	db, err := initDB()
-	require.Nil(t, err)
+	db := initDB()
 	defer db.Close()
 
-	err = populateDB(db)
-	require.Nil(t, err)
+	populateDB(db)
 
 	service := &RequestService{
 		DB: db,
 	}
 
-	err = service.DeleteAll()
+	err := service.DeleteAll()
 	assert.Nil(t, err)
 
 	var count int
