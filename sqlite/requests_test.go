@@ -1,7 +1,6 @@
 package sqlite
 
 import (
-	"context"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tylerdimon/bobber"
@@ -10,20 +9,7 @@ import (
 	"testing"
 )
 
-func initDB() *DB {
-	db := &DB{
-		DSN: ":memory:",
-	}
-	db.ctx, db.cancel = context.WithCancel(context.Background())
-	err := db.Open()
-	if err != nil {
-		db.Close()
-		log.Fatal(err)
-	}
-	return db
-}
-
-func populateDB(db *DB) {
+func populateRequests(db *DB) {
 	tx, err := db.conn.Begin()
 	if err != nil {
 		log.Fatal(err)
@@ -69,11 +55,11 @@ func populateDB(db *DB) {
 	}
 }
 
-func TestGetById(t *testing.T) {
+func TestRequestGetById(t *testing.T) {
 	db := initDB()
 	defer db.Close()
 
-	populateDB(db)
+	populateRequests(db)
 
 	service := &RequestService{
 		DB: db,
@@ -120,11 +106,11 @@ func TestGetById(t *testing.T) {
 	}
 }
 
-func TestGetAll(t *testing.T) {
+func TestRequestGetAll(t *testing.T) {
 	db := initDB()
 	defer db.Close()
 
-	populateDB(db)
+	populateRequests(db)
 
 	service := &RequestService{
 		DB: db,
@@ -158,11 +144,11 @@ func TestGetAll(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
-func TestDeleteAll(t *testing.T) {
+func TestRequestDeleteAll(t *testing.T) {
 	db := initDB()
 	defer db.Close()
 
-	populateDB(db)
+	populateRequests(db)
 
 	var count int
 	err := db.conn.Get(&count, "SELECT COUNT(*) FROM requests")
