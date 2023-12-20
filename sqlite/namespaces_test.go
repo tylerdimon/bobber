@@ -8,6 +8,11 @@ import (
 	"testing"
 )
 
+const UUID1 = "6e300e63-3b0a-470e-b169-f4460e1ccd82"
+const UUID2 = "6e300e63-3b0a-470e-b169-f4460e1ccd83"
+const TS1 = "2009-11-10 23:00:01 +0000 UTC"
+const TS2 = "2009-11-10 23:00:02 +0000 UTC"
+
 type NamespaceDbSuite struct {
 	db *DB
 	suite.Suite
@@ -38,15 +43,15 @@ func (s *NamespaceDbSuite) populateNamespaces() {
 	defer stmt.Close()
 
 	namespace1 := bobber.Namespace{
-		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
-		CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
+		ID:        UUID1,
+		CreatedAt: TS1,
 		Slug:      "first-space",
 		Name:      "First Space",
 	}
 
 	namespace2 := bobber.Namespace{
-		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd83",
-		CreatedAt: "2009-11-10 23:00:02 +0000 UTC",
+		ID:        UUID2,
+		CreatedAt: TS2,
 		Slug:      "second-space",
 		Name:      "Second Space",
 	}
@@ -62,7 +67,7 @@ func (s *NamespaceDbSuite) populateNamespaces() {
 	}
 }
 
-func (s *NamespaceDbSuite) TestNamespaceGetById() {
+func (s *NamespaceDbSuite) TestGetById() {
 	service := &NamespaceService{
 		DB: s.db,
 	}
@@ -75,12 +80,12 @@ func (s *NamespaceDbSuite) TestNamespaceGetById() {
 	}{
 		{
 			name: "Get Namespace By ID",
-			id:   "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+			id:   UUID1,
 			expected: bobber.Namespace{
-				ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+				ID:        UUID1,
 				Slug:      "first-space",
 				Name:      "First Space",
-				CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
+				CreatedAt: TS1,
 				UpdatedAt: "",
 			},
 			wantErr: false,
@@ -105,24 +110,24 @@ func (s *NamespaceDbSuite) TestNamespaceGetById() {
 	}
 }
 
-func (s *NamespaceDbSuite) TestNamespaceGetAll() {
+func (s *NamespaceDbSuite) TestGetAll() {
 	service := &NamespaceService{
 		DB: s.db,
 	}
 
 	expected := []*bobber.Namespace{
 		{
-			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+			ID:        UUID1,
 			Slug:      "first-space",
 			Name:      "First Space",
-			CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
+			CreatedAt: TS1,
 			UpdatedAt: "",
 		},
 		{
-			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd83",
+			ID:        UUID2,
 			Slug:      "second-space",
 			Name:      "Second Space",
-			CreatedAt: "2009-11-10 23:00:02 +0000 UTC",
+			CreatedAt: TS2,
 			UpdatedAt: "",
 		},
 	}
@@ -132,7 +137,7 @@ func (s *NamespaceDbSuite) TestNamespaceGetAll() {
 	s.Equal(expected, actual)
 }
 
-func (s *NamespaceDbSuite) TestNamespaceAdd() {
+func (s *NamespaceDbSuite) TestAdd() {
 	var count int
 	err := s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
 	s.Require().Nil(err)
@@ -193,11 +198,11 @@ func (s *NamespaceDbSuite) TestNamespaceAdd() {
 	s.Equal(3, count)
 }
 
-func (s *NamespaceDbSuite) TestNamespaceDeleteById() {
+func (s *NamespaceDbSuite) TestDeleteById() {
 
 }
 
-func (s *NamespaceDbSuite) TestNamespaceUpdate() {
+func (s *NamespaceDbSuite) TestUpdate() {
 
 }
 
