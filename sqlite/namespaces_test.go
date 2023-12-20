@@ -1,15 +1,29 @@
 package sqlite
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
 	"log"
 	"testing"
 )
 
-func populateNamespaces(db *DB) {
-	tx, err := db.conn.Begin()
+type NamespaceDbSuite struct {
+	db *DB
+	suite.Suite
+}
+
+func (s *NamespaceDbSuite) BeforeTest(suiteName, testName string) {
+	s.db = initDB()
+	s.populateNamespaces()
+}
+
+func (s *NamespaceDbSuite) AfterTest(suiteName, testName string) {
+	s.db.Close()
+}
+
+func (s *NamespaceDbSuite) populateNamespaces() {
+	tx, err := s.db.conn.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -24,15 +38,15 @@ func populateNamespaces(db *DB) {
 	defer stmt.Close()
 
 	namespace1 := bobber.Namespace{
-		ID:        mock.UUIDString,
-		CreatedAt: mock.TimestampString,
+		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+		CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
 		Slug:      "first-space",
 		Name:      "First Space",
 	}
 
 	namespace2 := bobber.Namespace{
-		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
-		CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
+		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd83",
+		CreatedAt: "2009-11-10 23:00:02 +0000 UTC",
 		Slug:      "second-space",
 		Name:      "Second Space",
 	}
@@ -48,14 +62,9 @@ func populateNamespaces(db *DB) {
 	}
 }
 
-func TestNamespaceGetById(t *testing.T) {
-	db := initDB()
-	defer db.Close()
-
-	populateNamespaces(db)
-
+func (s *NamespaceDbSuite) TestNamespaceGetById() {
 	service := &NamespaceService{
-		DB: db,
+		DB: s.db,
 	}
 
 	tests := []struct {
@@ -66,12 +75,12 @@ func TestNamespaceGetById(t *testing.T) {
 	}{
 		{
 			name: "Get Namespace By ID",
-			id:   mock.UUIDString,
+			id:   "6e300e63-3b0a-470e-b169-f4460e1ccd82",
 			expected: bobber.Namespace{
-				ID:        mock.UUIDString,
+				ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
 				Slug:      "first-space",
 				Name:      "First Space",
-				CreatedAt: mock.TimestampString,
+				CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
 				UpdatedAt: "",
 			},
 			wantErr: false,
@@ -84,54 +93,114 @@ func TestNamespaceGetById(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		s.Suite.Run(tt.name, func() {
 			got, err := service.GetById(tt.id)
 			if tt.wantErr {
-				assert.NotNil(t, err)
+				s.NotNil(err)
 			} else {
-				assert.Nil(t, err)
-				assert.Equal(t, tt.expected, *got)
+				s.Nil(err)
+				s.Equal(tt.expected, *got)
 			}
 		})
 	}
 }
 
-func TestNamespaceGetAll(t *testing.T) {
-	db := initDB()
-	defer db.Close()
-
-	populateNamespaces(db)
-
+func (s *NamespaceDbSuite) TestNamespaceGetAll() {
 	service := &NamespaceService{
-		DB: db,
+		DB: s.db,
 	}
 
 	expected := []*bobber.Namespace{
 		{
-			ID:        mock.UUIDString,
+			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
 			Slug:      "first-space",
 			Name:      "First Space",
-			CreatedAt: mock.TimestampString,
+			CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
 			UpdatedAt: "",
 		},
 		{
-			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
+			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd83",
 			Slug:      "second-space",
 			Name:      "Second Space",
-			CreatedAt: "2009-11-10 23:00:01 +0000 UTC",
+			CreatedAt: "2009-11-10 23:00:02 +0000 UTC",
 			UpdatedAt: "",
 		},
 	}
 
 	actual, err := service.GetAll()
-	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
+	s.Nil(err)
+	s.Equal(expected, actual)
 }
 
-// TODO
+func (s *NamespaceDbSuite) TestNamespaceAdd() {
+	var count int
+	err := s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+	s.Require().Nil(err)
+	s.Equal(2, count)
 
-//Add
+	service := &NamespaceService{
+		DB:  s.db,
+		Gen: mock.Generator(),
+	}
 
-//DeleteById
+	tests := []struct {
+		name     string
+		toAdd    bobber.Namespace
+		expected bobber.Namespace
+		wantErr  bool
+	}{
+		{
+			name: "Get Namespace By ID",
+			toAdd: bobber.Namespace{
+				Slug: "third-space",
+				Name: "Third Space",
+			},
+			expected: bobber.Namespace{
+				ID:        mock.UUIDString,
+				Slug:      "third-space",
+				Name:      "Third Space",
+				CreatedAt: mock.TimestampString,
+				UpdatedAt: "",
+				Endpoints: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Namespace Not Found",
+			toAdd: bobber.Namespace{
+				Slug:      "first-space",
+				Name:      "First Space",
+				UpdatedAt: "",
+			},
+			wantErr: true,
+		},
+	}
 
-//Update
+	for _, tt := range tests {
+		s.Suite.Run(tt.name, func() {
+			got, err := service.Add(tt.toAdd)
+			if tt.wantErr {
+				s.NotNil(err)
+			} else {
+				s.Nil(err)
+				s.Equal(tt.expected, *got)
+			}
+		})
+	}
+
+	err = s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+	s.Require().Nil(err)
+	s.Equal(3, count)
+}
+
+func (s *NamespaceDbSuite) TestNamespaceDeleteById() {
+
+}
+
+func (s *NamespaceDbSuite) TestNamespaceUpdate() {
+
+}
+
+func TestNamespaceDbSuite(t *testing.T) {
+	suite.Run(t, new(NamespaceDbSuite))
+}

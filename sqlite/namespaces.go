@@ -4,14 +4,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
 	"log"
 	"time"
 )
 
 type NamespaceService struct {
-	DB *DB
+	DB  *DB
+	Gen bobber.Generator
 }
 
 func (s *NamespaceService) GetById(id string) (*bobber.Namespace, error) {
@@ -98,8 +98,8 @@ SELECT id, slug, name, created_at, updated_at FROM namespaces ORDER BY name
 }
 
 func (s *NamespaceService) Add(namespace bobber.Namespace) (*bobber.Namespace, error) {
-	namespace.ID = uuid.New().String()
-	namespace.CreatedAt = time.Now().String()
+	namespace.ID = s.Gen.UUID().String()
+	namespace.CreatedAt = s.Gen.Now().String()
 
 	result, err := s.DB.conn.NamedExec(
 		`INSERT INTO namespaces (id, slug, name, created_at) VALUES (:id, :slug, :name, :created_at)`, &namespace)
