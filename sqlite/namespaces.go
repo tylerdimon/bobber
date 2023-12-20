@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/tylerdimon/bobber"
@@ -19,10 +20,12 @@ func (s *NamespaceService) GetById(id string) (*bobber.Namespace, error) {
 
 	query := `SELECT id, slug, name, created_at, updated_at FROM namespaces WHERE id = ?`
 
-	err := s.DB.conn.QueryRow(query, id).Scan(&ns.ID, &ns.Slug, &ns.Name, &ns.CreatedAt, &updatedAt)
-	if err != nil {
+	if err := s.DB.conn.QueryRow(query, id).Scan(&ns.ID, &ns.Slug, &ns.Name, &ns.CreatedAt, &updatedAt); err != nil {
 		log.Println(err)
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("NamespaceService GetById %s: Not Found", id)
+		}
+		return nil, fmt.Errorf("NamespaceService GetById %s: %v", id, err)
 	}
 
 	ns.UpdatedAt = Unwrap(updatedAt)
