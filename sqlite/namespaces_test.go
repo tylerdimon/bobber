@@ -4,7 +4,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
-	"log"
 	"testing"
 )
 
@@ -30,7 +29,7 @@ func (s *NamespaceDbSuite) AfterTest(suiteName, testName string) {
 func (s *NamespaceDbSuite) populateNamespaces() {
 	tx, err := s.db.conn.Begin()
 	if err != nil {
-		log.Fatal(err)
+		s.Require().Nil(err)
 	}
 	defer tx.Commit()
 
@@ -38,7 +37,7 @@ func (s *NamespaceDbSuite) populateNamespaces() {
 		INSERT INTO namespaces (id, slug, name, created_at) 
 		VALUES (?, ?, ?, ?)`)
 	if err != nil {
-		log.Fatal(err)
+		s.Require().Nil(err)
 	}
 	defer stmt.Close()
 
@@ -58,12 +57,12 @@ func (s *NamespaceDbSuite) populateNamespaces() {
 
 	_, err = stmt.Exec(namespace1.ID, namespace1.Slug, namespace1.Name, namespace1.CreatedAt)
 	if err != nil {
-		log.Fatal(err)
+		s.Require().Nil(err)
 	}
 
 	_, err = stmt.Exec(namespace2.ID, namespace2.Slug, namespace2.Name, namespace2.CreatedAt)
 	if err != nil {
-		log.Fatal(err)
+		s.Require().Nil(err)
 	}
 }
 
@@ -199,7 +198,49 @@ func (s *NamespaceDbSuite) TestAdd() {
 }
 
 func (s *NamespaceDbSuite) TestDeleteById() {
+	var count int
+	err := s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+	s.Require().Nil(err)
+	s.Equal(2, count)
 
+	service := &NamespaceService{
+		DB:  s.db,
+		Gen: mock.Generator(),
+	}
+
+	tests := []struct {
+		name     string
+		id       string
+		expected int
+		wantErr  bool
+	}{
+		{
+			name:     "Get Namespace By ID",
+			id:       UUID1,
+			expected: 1,
+			wantErr:  false,
+		},
+		{
+			name:    "Namespace Not Found",
+			id:      "does not exist",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		s.Suite.Run(tt.name, func() {
+			err := service.DeleteById(tt.id)
+			if tt.wantErr {
+				s.NotNil(err)
+			} else {
+				s.Nil(err)
+				var count int
+				err = s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+				s.Require().Nil(err)
+				s.Equal(tt.expected, count)
+			}
+		})
+	}
 }
 
 func (s *NamespaceDbSuite) TestUpdate() {

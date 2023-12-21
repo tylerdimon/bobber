@@ -124,7 +124,8 @@ func (s *NamespaceService) Update(namespace bobber.Namespace) (bobber.Namespace,
 func (s *NamespaceService) DeleteById(id string) error {
 	tx, err := s.DB.conn.Begin()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
 
 	defer func() {
@@ -137,6 +138,20 @@ func (s *NamespaceService) DeleteById(id string) error {
 			err = tx.Commit()
 		}
 	}()
+
+	var exists bool
+
+	err = tx.QueryRow("SELECT EXISTS(SELECT 1 FROM namespaces WHERE id = $1)", id).Scan(&exists)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	if !exists {
+		msg := fmt.Sprintf("Namespace with ID %s does not exist", id)
+		log.Print(msg)
+		return fmt.Errorf(msg)
+	}
 
 	log.Printf("Deleting endpoints for namespace %s", id)
 	if err = executeStmt(tx, "DELETE FROM endpoints WHERE namespace_id = $1", id); err != nil {
