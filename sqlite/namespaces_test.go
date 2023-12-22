@@ -244,7 +244,67 @@ func (s *NamespaceDbSuite) TestDeleteById() {
 }
 
 func (s *NamespaceDbSuite) TestUpdate() {
+	var count int
+	err := s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+	s.Require().Nil(err)
+	s.Equal(2, count)
 
+	service := &NamespaceService{
+		DB:  s.db,
+		Gen: mock.Generator(),
+	}
+
+	tests := []struct {
+		name     string
+		toUpdate bobber.Namespace
+		expected *bobber.Namespace
+		wantErr  bool
+	}{
+		{
+			name: "Get Namespace By ID",
+			toUpdate: bobber.Namespace{
+				ID:        UUID1,
+				Slug:      "third-space",
+				Name:      "Third Space",
+				CreatedAt: mock.TimestampString,
+			},
+			expected: &bobber.Namespace{
+				ID:        UUID1,
+				Slug:      "third-space",
+				Name:      "Third Space",
+				CreatedAt: mock.TimestampString,
+				UpdatedAt: mock.TimestampString,
+				Endpoints: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Namespace Not Found",
+			toUpdate: bobber.Namespace{
+				ID:        "does not exist",
+				Slug:      "first-space",
+				Name:      "First Space",
+				UpdatedAt: "",
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		s.Suite.Run(tt.name, func() {
+			got, err := service.Update(tt.toUpdate)
+			if tt.wantErr {
+				s.NotNil(err)
+			} else {
+				s.Nil(err)
+				s.Equal(tt.expected, got)
+			}
+		})
+	}
+
+	err = s.db.conn.Get(&count, "SELECT COUNT(*) FROM namespaces")
+	s.Require().Nil(err)
+	s.Equal(2, count)
 }
 
 func TestNamespaceDbSuite(t *testing.T) {

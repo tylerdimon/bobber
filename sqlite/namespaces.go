@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/tylerdimon/bobber"
 	"log"
-	"time"
 )
 
 type NamespaceService struct {
@@ -115,10 +114,27 @@ func (s *NamespaceService) Add(namespace bobber.Namespace) (*bobber.Namespace, e
 	return &namespace, nil
 }
 
-func (s *NamespaceService) Update(namespace bobber.Namespace) (bobber.Namespace, error) {
-	namespace.UpdatedAt = time.Now().String()
-	_, err := s.DB.conn.NamedExec(`UPDATE namespaces SET slug = :slug, name = :name, updated_at = :updated_at WHERE id = :id`, &namespace)
-	return namespace, err
+func (s *NamespaceService) Update(namespace bobber.Namespace) (*bobber.Namespace, error) {
+	namespace.UpdatedAt = s.Gen.Now().String()
+	result, err := s.DB.conn.NamedExec(`UPDATE namespaces SET slug = :slug, name = :name, updated_at = :updated_at WHERE id = :id`, &namespace)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	updates, err := result.RowsAffected()
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	if updates == 0 {
+		msg := fmt.Sprintf("Namespace with ID %s does not exist", namespace.ID)
+		log.Print(msg)
+		return nil, fmt.Errorf(msg)
+	}
+
+	return &namespace, err
 }
 
 func (s *NamespaceService) DeleteById(id string) error {
