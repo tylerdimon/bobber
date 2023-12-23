@@ -41,7 +41,8 @@ npm test
 #### Go
 
 ```
-go test ./...
+go install gotest.tools/gotestsum@latest
+gotestsum --format dots
 ```
 
 ### Formatting

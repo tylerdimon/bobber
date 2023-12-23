@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// ids and timestamps for pre-populated models
 const UUID1 = "6e300e63-3b0a-470e-b169-f4460e1ccd82"
 const UUID2 = "6e300e63-3b0a-470e-b169-f4460e1ccd83"
 const TS1 = "2009-11-10 23:00:01 +0000 UTC"
