@@ -112,7 +112,23 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(request.ID, request.Method, request.URL, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), request.NamespaceID, request.EndpointID)
+	var namespaceId sql.NullString
+	if request.NamespaceID == "" {
+		namespaceId.Valid = false
+	} else {
+		namespaceId.Valid = true
+		namespaceId.String = request.NamespaceID
+	}
+
+	var endpointId sql.NullString
+	if request.NamespaceID == "" {
+		endpointId.Valid = false
+	} else {
+		endpointId.Valid = true
+		endpointId.String = request.EndpointID
+	}
+
+	_, err = stmt.Exec(request.ID, request.Method, request.URL, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), namespaceId, endpointId)
 	if err != nil {
 		log.Printf("Error saving request to database - Request %v : %v", request, err)
 		return nil, err
