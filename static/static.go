@@ -16,9 +16,9 @@ var Assets embed.FS
 var html embed.FS
 
 const baseTemplatePath = "html/base.html"
-const requestsIndexPath = "html/requests.html"
-const singleRequestPath = "html/request.html"
-const configPath = "html/namespaces.html"
+const requestsIndexPath = "html/request-index.html"
+const singleRequestPath = "html/request-short.html"
+const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
 
