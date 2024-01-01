@@ -43,8 +43,8 @@ func (s *WebsocketService) HandleMessages() {
 	}
 }
 
-func (s *WebsocketService) Broadcast() chan *bobber.Request {
-	return s.broadcast
+func (s *WebsocketService) Broadcast(request *bobber.Request) {
+	s.broadcast <- request
 }
 
 func (s *WebsocketService) AddClient(client bobber.Client) {

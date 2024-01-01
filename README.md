@@ -40,6 +40,15 @@ npm test
 
 #### Go
 
+Mocks
+
+```
+rm -rf mocks
+mockery
+```
+
+Test
+
 ```
 go install gotest.tools/gotestsum@latest
 gotestsum --format dots

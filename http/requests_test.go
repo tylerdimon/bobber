@@ -2,60 +2,26 @@ package http
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 )
 
-func setup() (*mock.RequestService, *mock.WebsocketService) {
-	mockService := new(mock.RequestService)
-	mockService.Gen = mock.Generator()
-
-	websocketService := new(mock.WebsocketService)
-	websocketService.Init()
-
-	return mockService, websocketService
-}
-
 func TestRecordRequestHandler(t *testing.T) {
-	mockRequestService, mockWebsocketService := setup()
-	handler := RequestHandler{
-		Service:          mockRequestService,
-		WebsocketService: mockWebsocketService,
+	mockRequestService := bobber.NewMockRequestService(t)
+	mockWebsocketService := bobber.NewMockWebsocketService(t)
+
+	requestToSave := bobber.Request{
+		Method:  "POST",
+		Host:    "",
+		Path:    "/requests/test",
+		Body:    `{"some":"json","body":"values"}`,
+		Headers: nil,
 	}
 
-	requestBody := bytes.NewBufferString(`{"some":"json","body":"values"}`)
-
-	req, err := http.NewRequest("POST", "/requests/test", requestBody)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	rr := httptest.NewRecorder()
-	handlerFunc := http.HandlerFunc(handler.RecordRequestHandler)
-
-	go handlerFunc.ServeHTTP(rr, req)
-
-	select {
-	case val := <-mockWebsocketService.Broadcast():
-		// TODO validate message value
-		t.Logf("Got message: %s", val)
-	case <-time.After(time.Second * 1):
-		t.Error("Expected a value to be sent to the channel, but timed out")
-	}
-
-	if rr.Code != http.StatusOK {
-		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
-	}
-	if rr.Body.String() != "Request received" {
-		t.Errorf("expected '%v' but got '%v'", "Request received", rr.Body.String())
-	}
-
-	expectedRequest := &bobber.Request{
+	savedRequest := &bobber.Request{
 		ID:        mock.UUIDString,
 		Method:    "POST",
 		Host:      "",
@@ -65,7 +31,30 @@ func TestRecordRequestHandler(t *testing.T) {
 		Headers:   nil,
 	}
 
-	assert.Equal(t, expectedRequest, mockRequestService.Requests[0])
+	mockRequestService.EXPECT().Match("POST", "/requests/test").Return("", "", "").Once()
+	mockRequestService.EXPECT().Add(requestToSave).Return(savedRequest, nil).Once()
+	mockWebsocketService.EXPECT().Broadcast(savedRequest).Once()
+
+	requestBody := bytes.NewBufferString(`{"some":"json","body":"values"}`)
+	req, err := http.NewRequest("POST", "/requests/test", requestBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	handler := RequestHandler{
+		Service:          mockRequestService,
+		WebsocketService: mockWebsocketService,
+	}
+	handlerFunc := http.HandlerFunc(handler.RecordRequestHandler)
+	handlerFunc.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
+	}
+	if rr.Body.String() != "Request received" {
+		t.Errorf("expected '%v' but got '%v'", "Request received", rr.Body.String())
+	}
 }
 
 // TODO convert to index test

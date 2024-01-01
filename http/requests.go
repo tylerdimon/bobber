@@ -56,7 +56,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	h.WebsocketService.Broadcast() <- savedRequest
+	h.WebsocketService.Broadcast(savedRequest)
 
 	if response == "" {
 		w.Write([]byte("Request received"))

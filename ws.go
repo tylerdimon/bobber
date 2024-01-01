@@ -2,7 +2,7 @@ package bobber
 
 type WebsocketService interface {
 	HandleMessages()
-	Broadcast() chan *Request
+	Broadcast(request *Request)
 	AddClient(Client)
 	DeleteClient(Client)
 }

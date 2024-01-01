@@ -1,5 +1,7 @@
 ## TODO
 
+- move mockery files to  mock/ directory https://vektra.github.io/mockery/latest/migrating_to_packages/
+
 - namespaces
   - logging
   - error handling
