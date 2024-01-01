@@ -17,8 +17,8 @@ func populateRequests(db *DB) {
 	defer tx.Commit()
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO requests (id, method, url, host, path, timestamp, body, headers) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+		INSERT INTO requests (id, method, host, path, timestamp, body, headers) 
+		VALUES (?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,9 +28,8 @@ func populateRequests(db *DB) {
 		ID:        mock.UUIDString,
 		Timestamp: mock.ParseTime(mock.TimestampString),
 		Method:    "GET",
-		URL:       "/path/one",
 		Host:      "google.com",
-		Path:      "",
+		Path:      "/path/one",
 		Body:      "",
 	}
 
@@ -38,18 +37,17 @@ func populateRequests(db *DB) {
 		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
 		Timestamp: mock.ParseTime("2009-11-10 23:00:01 +0000 UTC"),
 		Method:    "POST",
-		URL:       "/path/two",
 		Host:      "example.com",
-		Path:      "",
+		Path:      "/path/two",
 		Body:      "some body text",
 	}
 
-	_, err = stmt.Exec(request1.ID, request1.Method, request1.URL, request1.Host, request1.Path, request1.Timestamp, request1.Body, "")
+	_, err = stmt.Exec(request1.ID, request1.Method, request1.Host, request1.Path, request1.Timestamp, request1.Body, "")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = stmt.Exec(request2.ID, request2.Method, request2.URL, request2.Host, request2.Path, request2.Timestamp, request2.Body, "")
+	_, err = stmt.Exec(request2.ID, request2.Method, request2.Host, request2.Path, request2.Timestamp, request2.Body, "")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,9 +75,8 @@ func TestRequestGetById(t *testing.T) {
 			expected: bobber.Request{
 				ID:        mock.UUIDString,
 				Method:    "GET",
-				URL:       "/path/one",
 				Host:      "google.com",
-				Path:      "",
+				Path:      "/path/one",
 				Timestamp: mock.ParseTime(mock.TimestampString),
 				Body:      "",
 				Headers:   nil,
@@ -120,9 +117,8 @@ func TestRequestGetAll(t *testing.T) {
 		{
 			ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
 			Method:    "POST",
-			URL:       "/path/two",
 			Host:      "example.com",
-			Path:      "",
+			Path:      "/path/two",
 			Timestamp: mock.ParseTime("2009-11-10 23:00:01 +0000 UTC"),
 			Body:      "some body text",
 			Headers:   nil,
@@ -130,9 +126,8 @@ func TestRequestGetAll(t *testing.T) {
 		{
 			ID:        mock.UUIDString,
 			Method:    "GET",
-			URL:       "/path/one",
 			Host:      "google.com",
-			Path:      "",
+			Path:      "/path/one",
 			Timestamp: mock.ParseTime(mock.TimestampString),
 			Body:      "",
 			Headers:   nil,

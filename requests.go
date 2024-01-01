@@ -5,7 +5,6 @@ import "time"
 type Request struct {
 	ID             string    `db:"id"`
 	Method         string    `db:"method"`
-	URL            string    `db:"url"`
 	Host           string    `db:"host"`
 	Path           string    `db:"path"`
 	Timestamp      time.Time `db:"timestamp"`

@@ -58,7 +58,6 @@ func TestRecordRequestHandler(t *testing.T) {
 	expectedRequest := &bobber.Request{
 		ID:        mock.UUIDString,
 		Method:    "POST",
-		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
 		Timestamp: mock.ParseTime(mock.TimestampString),
@@ -66,12 +65,6 @@ func TestRecordRequestHandler(t *testing.T) {
 		Headers:   nil,
 	}
 
-	//if mockRequestService.Requests[0] != expectedRequest {
-	//	if rr.Body.String() != "Request received" {
-	//		t.Errorf("expected '%v' but got '%v'", expectedRequest, mockRequestService.Requests[0])
-	//	}
-	//
-	//}
 	assert.Equal(t, expectedRequest, mockRequestService.Requests[0])
 }
 

@@ -25,7 +25,7 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	var endpointID sql.NullString
 	var ts string
 
-	err := rows.Scan(&r.ID, &r.Method, &r.URL, &r.Host, &r.Path, &ts, &r.Body,
+	err := rows.Scan(&r.ID, &r.Method, &r.Host, &r.Path, &ts, &r.Body,
 		&headersJSON, &namespaceId, &endpointID, &namespaceName)
 	if err != nil {
 		log.Println(err)
@@ -55,7 +55,7 @@ func scan(rows Scannable) (*bobber.Request, error) {
 
 func (s *RequestService) GetById(id string) (*bobber.Request, error) {
 	query := `
-SELECT r.id, r.method, r.url, r.host, r.path, r.timestamp, r.body,
+SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
 	   r.headers, r.namespace_id, r.endpoint_id, n.name 
 FROM requests r 
 LEFT JOIN namespaces n on r.namespace_id = n.id 
@@ -72,7 +72,7 @@ WHERE r.id = ?;`
 
 func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	query := `
-SELECT r.id, r.method, r.url, r.host, r.path, r.timestamp, r.body,
+SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
 	   r.headers, r.namespace_id, r.endpoint_id, n.name
 FROM requests r
 LEFT JOIN namespaces n on r.namespace_id = n.id
@@ -112,7 +112,7 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 		log.Fatal(err)
 	}
 
-	stmt, err := s.DB.conn.Prepare(`INSERT INTO requests (id, method, url, host, path, timestamp, body, headers, namespace_id, endpoint_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	stmt, err := s.DB.conn.Prepare(`INSERT INTO requests (id, method, host, path, timestamp, body, headers, namespace_id, endpoint_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		log.Printf("Error preparing statement - Request %v : %v", request, err)
 		return nil, err
@@ -135,7 +135,7 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 		endpointId.String = request.EndpointID
 	}
 
-	_, err = stmt.Exec(request.ID, request.Method, request.URL, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), namespaceId, endpointId)
+	_, err = stmt.Exec(request.ID, request.Method, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), namespaceId, endpointId)
 	if err != nil {
 		log.Printf("Error saving request to database - Request %v : %v", request, err)
 		return nil, err

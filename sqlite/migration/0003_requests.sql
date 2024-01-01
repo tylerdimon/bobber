@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS requests (
     id TEXT PRIMARY KEY,
     method  TEXT NOT NULL,
-    url  TEXT NOT NULL,
     host  TEXT NOT NULL,
     path  TEXT NOT NULL,
     timestamp  TEXT NOT NULL,
