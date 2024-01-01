@@ -40,7 +40,6 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 
 	request := bobber.Request{
 		Method:  r.Method,
-		URL:     r.URL.String(),
 		Path:    r.URL.Path,
 		Host:    r.Host,
 		Body:    body,

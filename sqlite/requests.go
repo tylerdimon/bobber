@@ -23,8 +23,9 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	var namespaceId sql.NullString
 	var namespaceName sql.NullString
 	var endpointID sql.NullString
+	var ts string
 
-	err := rows.Scan(&r.ID, &r.Method, &r.URL, &r.Host, &r.Path, &r.Timestamp, &r.Body,
+	err := rows.Scan(&r.ID, &r.Method, &r.URL, &r.Host, &r.Path, &ts, &r.Body,
 		&headersJSON, &namespaceId, &endpointID, &namespaceName)
 	if err != nil {
 		log.Println(err)
@@ -42,6 +43,12 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	r.NamespaceID = Unwrap(namespaceId)
 	r.NamespaceName = Unwrap(namespaceName)
 	r.EndpointID = Unwrap(endpointID)
+
+	timestamp, err := ParseTime(ts)
+	if err != nil {
+		log.Printf("Error parsing timestamp for request: %s", err)
+	}
+	r.Timestamp = timestamp
 
 	return &r, nil
 }
@@ -98,7 +105,7 @@ ORDER BY r.timestamp DESC;`
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	request.ID = s.Gen.UUID().String()
-	request.Timestamp = s.Gen.Now().String()
+	request.Timestamp = s.Gen.Now()
 
 	headersJSON, err := json.Marshal(request.Headers)
 	if err != nil {

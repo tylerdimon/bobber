@@ -1,16 +1,16 @@
-/* light #eee2df */
-/* dark #171614 */
-/* blue #33658a */
-/* orange #c97c5d */
-/* dark green #37423d */
+:root {
+    --black: #171614;
+    --blue: #33658a;
+    --orange: #c97c5d;
+    --bg-color: #eee2df;
+    --secondary-bg-color: #37423d;
+    --space: 1rem
+}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #171614;
-    background-color: #eee2df;
-    width: 95%;
-    margin: 0 auto;
-    padding: 0;
+    color: var(--black);
+    background-color: var(--bg-color);
 }
 
 header {
@@ -19,35 +19,45 @@ header {
     align-items: baseline;
 }
 
+h1 {
+    color: var(--orange);
+}
+
 nav {
     display: flex;
     gap: 15px;
 }
 
 nav a {
+    color: var(--blue);
     font-size: 20px;
 }
 
 footer {
-    border-top: 1px solid #171614;
+    border-top: 1px solid var(--black);
 }
 
-a {
-    color: #33658a;
-}
-
-#request-list {
+.stack {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    margin: 20px 0;
+    justify-content: flex-start;
+    margin: var(--space) 0;
+}
+
+.stack > * {
+    margin-block: 0;
+}
+
+.stack > * + * {
+    margin-block-start: var(--space);
 }
 
 .request-detail {
-    background-color: #37423d;
-    color: #eee2df;
+    background-color: var(--secondary-bg-color);
+    color: var(--bg-color);
+    padding: calc(var(--space) / 2);
+
     display: flex;
+    gap: var(--space);
     flex-wrap: wrap;
-    gap: 20px;
-    padding: 10px;
 }

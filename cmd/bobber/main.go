@@ -17,7 +17,7 @@ func main() {
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	db := sqlite.NewDB("bobber.sqlite")
+	db := sqlite.NewDB("bobber.sqlite?parseTime=true")
 	if err := db.Open(); err != nil {
 		log.Fatal(err)
 	}

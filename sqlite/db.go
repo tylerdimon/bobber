@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"time"
 )
 
 //go:embed migration/*.sql
@@ -133,4 +134,9 @@ func Unwrap(str sql.NullString) string {
 	} else {
 		return ""
 	}
+}
+
+func ParseTime(timestamp string) (time.Time, error) {
+	layout := "2006-01-02 15:04:05.9999999 -0700 MST"
+	return time.Parse(layout, timestamp)
 }

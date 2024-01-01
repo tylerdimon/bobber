@@ -1,19 +1,21 @@
 package bobber
 
+import "time"
+
 type Request struct {
-	ID             string   `db:"id"`
-	Method         string   `db:"method"`
-	URL            string   `db:"url"`
-	Host           string   `db:"host"`
-	Path           string   `db:"path"`
-	Timestamp      string   `db:"timestamp"`
-	Body           string   `db:"body"`
-	Headers        []Header `db:"headers"`
-	NamespaceID    string   `db:"namespace_id"`
-	NamespaceName  string   `db:"namespace_name"`
-	EndpointID     string   `db:"endpoint_id"`
-	EndpointMethod string   `db:"endpoint_method"`
-	EndpointPath   string   `db:"endpoint_path"`
+	ID             string    `db:"id"`
+	Method         string    `db:"method"`
+	URL            string    `db:"url"`
+	Host           string    `db:"host"`
+	Path           string    `db:"path"`
+	Timestamp      time.Time `db:"timestamp"`
+	Body           string    `db:"body"`
+	Headers        []Header  `db:"headers"`
+	NamespaceID    string    `db:"namespace_id"`
+	NamespaceName  string    `db:"namespace_name"`
+	EndpointID     string    `db:"endpoint_id"`
+	EndpointMethod string    `db:"endpoint_method"`
+	EndpointPath   string    `db:"endpoint_path"`
 }
 
 type Header struct {

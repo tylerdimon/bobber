@@ -3,10 +3,10 @@ package static
 import (
 	"bytes"
 	"embed"
+	"github.com/Masterminds/sprig/v3"
 	"github.com/tylerdimon/bobber"
 	"html/template"
 	"log"
-	"strings"
 )
 
 //go:embed assets
@@ -16,7 +16,7 @@ var Assets embed.FS
 var html embed.FS
 
 const baseTemplatePath = "html/base.html"
-const requestsIndexPath = "html/index.html"
+const requestsIndexPath = "html/requests.html"
 const singleRequestPath = "html/request.html"
 const configPath = "html/namespaces.html"
 const namespaceAddPath = "html/namespace-detail.html"
@@ -31,18 +31,12 @@ var EndpointAddTemplate *template.Template
 func ParseHTML() {
 	var err error
 
-	funcMap := template.FuncMap{
-		"splitOnNewline": func(s string) []string {
-			return strings.Split(s, "\n")
-		},
-	}
-
-	IndexTemplate, err = template.New("base.html").Funcs(funcMap).ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath)
+	IndexTemplate, err = template.New("base.html").Funcs(sprig.FuncMap()).ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	RequestTemplate, err = template.New("requests").Funcs(funcMap).ParseFS(html, singleRequestPath)
+	RequestTemplate, err = template.New("requests").Funcs(sprig.FuncMap()).ParseFS(html, singleRequestPath)
 	if err != nil {
 		log.Fatal(err)
 	}

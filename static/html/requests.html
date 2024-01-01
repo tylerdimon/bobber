@@ -2,7 +2,7 @@
 
 <h2>All Requests</h2>
 <button id="delete-requests">Clear All Requests</button>
-<div id="request-list">
+<div class="stack">
     {{range .Data}}
         {{template "request" .}}
     {{end}}
