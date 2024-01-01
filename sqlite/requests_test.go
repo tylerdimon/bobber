@@ -26,7 +26,7 @@ func populateRequests(db *DB) {
 
 	request1 := bobber.Request{
 		ID:        mock.UUIDString,
-		Timestamp: mock.TimestampString,
+		Timestamp: mock.ParseTime(mock.TimestampString),
 		Method:    "GET",
 		URL:       "/path/one",
 		Host:      "google.com",
@@ -36,7 +36,7 @@ func populateRequests(db *DB) {
 
 	request2 := bobber.Request{
 		ID:        "6e300e63-3b0a-470e-b169-f4460e1ccd82",
-		Timestamp: "2009-11-10 23:00:01 +0000 UTC",
+		Timestamp: mock.ParseTime("2009-11-10 23:00:01 +0000 UTC"),
 		Method:    "POST",
 		URL:       "/path/two",
 		Host:      "example.com",
@@ -80,7 +80,7 @@ func TestRequestGetById(t *testing.T) {
 				URL:       "/path/one",
 				Host:      "google.com",
 				Path:      "",
-				Timestamp: mock.TimestampString,
+				Timestamp: mock.ParseTime(mock.TimestampString),
 				Body:      "",
 				Headers:   nil,
 			},
@@ -123,7 +123,7 @@ func TestRequestGetAll(t *testing.T) {
 			URL:       "/path/two",
 			Host:      "example.com",
 			Path:      "",
-			Timestamp: "2009-11-10 23:00:01 +0000 UTC",
+			Timestamp: mock.ParseTime("2009-11-10 23:00:01 +0000 UTC"),
 			Body:      "some body text",
 			Headers:   nil,
 		},
@@ -133,7 +133,7 @@ func TestRequestGetAll(t *testing.T) {
 			URL:       "/path/one",
 			Host:      "google.com",
 			Path:      "",
-			Timestamp: mock.TimestampString,
+			Timestamp: mock.ParseTime(mock.TimestampString),
 			Body:      "",
 			Headers:   nil,
 		},

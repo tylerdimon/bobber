@@ -27,12 +27,16 @@ func UUIDGenerator(uuidStr string) func() uuid.UUID {
 }
 
 func TimeGenerator(timestamp string) func() time.Time {
+	return func() time.Time {
+		return ParseTime(timestamp)
+	}
+}
+
+func ParseTime(timestamp string) time.Time {
 	layout := "2006-01-02 15:04:05 +0000 UTC"
 	now, err := time.Parse(layout, timestamp)
 	if err != nil {
 		panic(err)
 	}
-	return func() time.Time {
-		return now
-	}
+	return now
 }

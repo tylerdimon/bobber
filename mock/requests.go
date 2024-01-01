@@ -22,7 +22,7 @@ func (s *RequestService) Match(method string, path string) (namespaceID, endpoin
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	request.ID = s.Gen.UUID().String()
-	request.Timestamp = s.Gen.Now().String()
+	request.Timestamp = s.Gen.Now()
 
 	s.AddCalled = s.AddCalled + 1
 	s.Requests = append(s.Requests, &request)

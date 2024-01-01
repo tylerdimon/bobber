@@ -7,15 +7,16 @@ import (
 
 const MonotonicClock = 1
 
-// this Generator interface allows for easy mocking in tests
+// Generator this interface allows for easy mocking of ID and timestamp generation in tests
 type Generator struct {
 	Now  func() time.Time
 	UUID func() uuid.UUID
 }
 
-func GetGenerator() Generator {
+func NewGenerator() Generator {
 	return Generator{
 		Now: func() time.Time {
+			// the monotonic clock causes issues when converting to and from strings
 			return time.Now().Truncate(MonotonicClock)
 		},
 		UUID: uuid.New,

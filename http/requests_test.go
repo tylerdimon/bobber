@@ -61,7 +61,7 @@ func TestRecordRequestHandler(t *testing.T) {
 		URL:       "/requests/test",
 		Host:      "",
 		Path:      "/requests/test",
-		Timestamp: mock.TimestampString,
+		Timestamp: mock.ParseTime(mock.TimestampString),
 		Body:      `{"some":"json","body":"values"}`,
 		Headers:   nil,
 	}

@@ -23,7 +23,7 @@ func main() {
 	}
 	defer db.Close()
 
-	generator := bobber.GetGenerator()
+	generator := bobber.NewGenerator()
 
 	requestService := &sqlite.RequestService{}
 	requestService.DB = db
