@@ -2,8 +2,8 @@ package http
 
 import (
 	"bytes"
+	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
-	"github.com/tylerdimon/bobber/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,18 +21,7 @@ func TestRecordRequestHandler(t *testing.T) {
 		NamespaceID: "1234",
 		EndpointID:  "4567",
 	}
-
-	savedRequest := &bobber.Request{
-		ID:          mock.UUIDString,
-		Method:      "POST",
-		Host:        "",
-		Path:        "/requests/test",
-		Timestamp:   mock.ParseTime(mock.TimestampString),
-		Body:        `{"some":"json","body":"values"}`,
-		Headers:     nil,
-		NamespaceID: "1234",
-		EndpointID:  "4567",
-	}
+	savedRequest := &bobber.Request{}
 
 	mockRequestService.EXPECT().Match("POST", "/requests/test").Return("1234", "4567", "a response").Once()
 	mockRequestService.EXPECT().Add(requestToSave).Return(savedRequest, nil).Once()
@@ -52,12 +41,8 @@ func TestRecordRequestHandler(t *testing.T) {
 	handlerFunc := http.HandlerFunc(handler.RecordRequestHandler)
 	handlerFunc.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusOK {
-		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
-	}
-	if rr.Body.String() != "a response" {
-		t.Errorf("expected '%v' but got '%v'", "Request received", rr.Body.String())
-	}
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, "a response", rr.Body.String())
 }
 
 // TODO convert to index test
