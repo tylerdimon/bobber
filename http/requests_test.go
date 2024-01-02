@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
+	"github.com/tylerdimon/bobber/mock"
+	"github.com/tylerdimon/bobber/static"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -33,80 +35,63 @@ func TestRecordRequestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	rr := httptest.NewRecorder()
 	handler := RequestHandler{
 		Service:          mockRequestService,
 		WebsocketService: mockWebsocketService,
 	}
 	handlerFunc := http.HandlerFunc(handler.RecordRequestHandler)
+	rr := httptest.NewRecorder()
 	handlerFunc.ServeHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Equal(t, "a response", rr.Body.String())
 }
 
-// TODO convert to index test
-//func TestGetAllRequestsHandler(t *testing.T) {
-//	mockRequestService, mockWebsocketService := setup()
-//	handler := RequestHandler{
-//		Service:          mockRequestService,
-//		WebsocketService: mockWebsocketService,
-//	}
-//
-//	expectedRequest1 := bobber.Request{
-//		ID:        mock.UUIDString,
-//		Method:    "",
-//		URL:       "123",
-//		Host:      "",
-//		Path:      "",
-//		Timestamp: mock.TimestampString,
-//		Body:      "",
-//		Headers:   []bobber.Header{},
-//	}
-//	expectedRequest2 := bobber.Request{
-//		ID:        mock.UUIDString,
-//		Method:    "",
-//		URL:       "456",
-//		Host:      "",
-//		Path:      "",
-//		Timestamp: mock.TimestampString,
-//		Body:      "",
-//		Headers:   []bobber.Header{},
-//	}
-//	_, err := mockRequestService.Add(expectedRequest1)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	_, err = mockRequestService.Add(expectedRequest2)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	req, err := http.NewRequest("GET", "/api/requests/all", nil)
-//	if err != nil {
-//		t.Fatal(err)
-//	}
-//
-//	rr := httptest.NewRecorder()
-//	handlerFunc := http.HandlerFunc(handler.RequestIndexHandler)
-//
-//	handlerFunc.ServeHTTP(rr, req)
-//
-//	if rr.Code != http.StatusOK {
-//		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
-//	}
-//
-//	//expectedRequestStrings := []string{expectedRequest1.String(), expectedRequest2.String()}
-//	//expectedBody, err := json.Marshal(expectedRequestStrings)
-//	//if err != nil {
-//	//	t.Fatal(err)
-//	//}
-//	//
-//	//if rr.Body.String() != string(expectedBody) {
-//	//	t.Errorf("expected '%v' but got '%v'", "Request received", rr.Body.String())
-//	//}
-//}
+func TestRequestIndexHandler(t *testing.T) {
+	static.ParseHTML()
+
+	mockRequestService := bobber.NewMockRequestService(t)
+
+	request1 := &bobber.Request{
+		ID:      mock.UUIDString,
+		Method:  "GET",
+		Host:    "",
+		Path:    "/path",
+		Body:    "",
+		Headers: []bobber.Header{},
+	}
+	request2 := &bobber.Request{
+		ID:      mock.UUIDString,
+		Method:  "POST",
+		Host:    "",
+		Path:    "/another/path",
+		Body:    "",
+		Headers: []bobber.Header{},
+	}
+
+	mockRequestService.EXPECT().GetAll().Return([]*bobber.Request{request1, request2}, nil).Once()
+
+	req, err := http.NewRequest("GET", "/api/requests/all", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := RequestHandler{
+		Service: mockRequestService,
+	}
+	handlerFunc := http.HandlerFunc(handler.RequestIndexHandler)
+	rr := httptest.NewRecorder()
+	handlerFunc.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
+	}
+
+	// TODO test order, timestamps
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Contains(t, rr.Body.String(), "GET /path")
+	assert.Contains(t, rr.Body.String(), "POST /another/path")
+}
 
 func DeleteAllRequestsHandler(t *testing.T) {
 
