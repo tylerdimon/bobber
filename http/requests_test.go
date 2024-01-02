@@ -72,7 +72,7 @@ func TestRequestIndexHandler(t *testing.T) {
 
 	mockRequestService.EXPECT().GetAll().Return([]*bobber.Request{request1, request2}, nil).Once()
 
-	req, err := http.NewRequest("GET", "/api/requests/all", nil)
+	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,12 +84,31 @@ func TestRequestIndexHandler(t *testing.T) {
 	rr := httptest.NewRecorder()
 	handlerFunc.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusOK {
-		t.Errorf("expected '%d' but got '%d'", http.StatusOK, rr.Code)
-	}
-
 	// TODO test order, timestamps
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Contains(t, rr.Body.String(), "GET /path")
 	assert.Contains(t, rr.Body.String(), "POST /another/path")
+}
+
+func TestDeleteAllRequestsHandler(t *testing.T) {
+	static.ParseHTML()
+
+	mockRequestService := mocks.NewRequestService(t)
+
+	mockRequestService.EXPECT().DeleteAll().Return(nil).Once()
+
+	req, err := http.NewRequest("DELETE", "/requests", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	handler := RequestHandler{
+		Service: mockRequestService,
+	}
+	handlerFunc := http.HandlerFunc(handler.DeleteAllRequestsHandler)
+	rr := httptest.NewRecorder()
+	handlerFunc.ServeHTTP(rr, req)
+
+	assert.Equal(t, http.StatusSeeOther, rr.Code)
+	assert.Equal(t, "/", rr.Header().Get("Location"))
 }

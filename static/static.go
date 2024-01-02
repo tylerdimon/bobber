@@ -21,7 +21,7 @@ const singleRequestPath = "html/request-short.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
-const actionButtonPath = "html/components/button.html"
+const actionButtonPath = "html/components/action-button.html"
 
 var IndexTemplate *template.Template
 var ConfigTemplate *template.Template

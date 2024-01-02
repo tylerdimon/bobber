@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/static"
@@ -18,7 +17,7 @@ type RequestHandler struct {
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
 	r.HandleFunc("/requests", h.DeleteAllRequestsHandler).Methods("DELETE")
 	r.PathPrefix("/requests/").HandlerFunc(h.RecordRequestHandler)
-	r.HandleFunc("/", h.RequestIndexHandler)
+	r.HandleFunc("/", h.RequestIndexHandler).Methods("GET")
 }
 
 func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Request) {
@@ -92,5 +91,7 @@ func (h *RequestHandler) DeleteAllRequestsHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	fmt.Fprintln(w, "All requests cleared")
+	log.Println("All requests cleared")
+	http.Redirect(w, r, "", http.StatusSeeOther)
+
 }
