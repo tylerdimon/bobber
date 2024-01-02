@@ -1,0 +1,6 @@
+{{define "action-button"}}
+<form method="POST" action="{{.Action}}" class="action-button">
+    <input type="hidden" name="_method" value="{{.Method}}" />
+    <input type="submit" value="{{.ButtonText}}">
+</form>
+{{end}}

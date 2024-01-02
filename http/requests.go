@@ -16,7 +16,7 @@ type RequestHandler struct {
 }
 
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
-	r.HandleFunc("/api/requests/delete", h.DeleteAllRequestsHandler)
+	r.HandleFunc("/requests", h.DeleteAllRequestsHandler).Methods("DELETE")
 	r.PathPrefix("/requests/").HandlerFunc(h.RecordRequestHandler)
 	r.HandleFunc("/", h.RequestIndexHandler)
 }

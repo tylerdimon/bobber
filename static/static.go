@@ -21,6 +21,7 @@ const singleRequestPath = "html/request-short.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
+const actionButtonPath = "html/components/button.html"
 
 var IndexTemplate *template.Template
 var ConfigTemplate *template.Template
@@ -31,7 +32,7 @@ var EndpointAddTemplate *template.Template
 func ParseHTML() {
 	var err error
 
-	IndexTemplate, err = template.New("base.html").Funcs(sprig.FuncMap()).ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath)
+	IndexTemplate, err = template.New("base.html").Funcs(sprig.FuncMap()).ParseFS(html, baseTemplatePath, requestsIndexPath, singleRequestPath, actionButtonPath)
 	if err != nil {
 		log.Fatal(err)
 	}

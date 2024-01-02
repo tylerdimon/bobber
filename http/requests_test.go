@@ -93,7 +93,3 @@ func TestRequestIndexHandler(t *testing.T) {
 	assert.Contains(t, rr.Body.String(), "GET /path")
 	assert.Contains(t, rr.Body.String(), "POST /another/path")
 }
-
-func DeleteAllRequestsHandler(t *testing.T) {
-
-}
