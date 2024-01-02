@@ -1,9 +1,10 @@
 with-expecter: True
-inpackage: True
-dir: "{{.InterfaceDir}}"
-mockname: "Mock{{.InterfaceName}}"
-outpkg: "{{.PackageName}}"
-filename: "mock_{{.InterfaceName}}.go"
+dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+mockname: "{{.InterfaceName}}"
+outpkg: "mocks"
+filename: "{{.InterfaceName}}.go"
 all: True
 packages:
   github.com/tylerdimon/bobber:
+#    config:
+#      recursive: True

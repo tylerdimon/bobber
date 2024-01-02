@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
+	"github.com/tylerdimon/bobber/mocks"
 	"github.com/tylerdimon/bobber/static"
 	"net/http"
 	"net/http/httptest"
@@ -12,8 +13,8 @@ import (
 )
 
 func TestRecordRequestHandler(t *testing.T) {
-	mockRequestService := bobber.NewMockRequestService(t)
-	mockWebsocketService := bobber.NewMockWebsocketService(t)
+	mockRequestService := mocks.NewRequestService(t)
+	mockWebsocketService := mocks.NewWebsocketService(t)
 
 	requestToSave := bobber.Request{
 		Method:      "POST",
@@ -50,7 +51,7 @@ func TestRecordRequestHandler(t *testing.T) {
 func TestRequestIndexHandler(t *testing.T) {
 	static.ParseHTML()
 
-	mockRequestService := bobber.NewMockRequestService(t)
+	mockRequestService := mocks.NewRequestService(t)
 
 	request1 := &bobber.Request{
 		ID:      mock.UUIDString,
