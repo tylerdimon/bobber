@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/mock"
@@ -9,6 +10,8 @@ import (
 	"github.com/tylerdimon/bobber/static"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -90,24 +93,30 @@ func TestRequestIndexHandler(t *testing.T) {
 	assert.Contains(t, rr.Body.String(), "POST /another/path")
 }
 
+func setupServer() {
+
+}
+
 func TestDeleteAllRequestsHandler(t *testing.T) {
 	static.ParseHTML()
 
 	mockRequestService := mocks.NewRequestService(t)
+	s := Server{router: mux.NewRouter()}
+	handler := RequestHandler{Service: mockRequestService}
+	handler.RegisterRequestRoutes(s.router)
 
 	mockRequestService.EXPECT().DeleteAll().Return(nil).Once()
 
-	req, err := http.NewRequest("DELETE", "/requests", nil)
+	formData := url.Values{}
+	formData.Set("_method", "DELETE")
+	req, err := http.NewRequest("POST", "/requests", strings.NewReader(formData.Encode()))
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	handler := RequestHandler{
-		Service: mockRequestService,
-	}
-	handlerFunc := http.HandlerFunc(handler.DeleteAllRequestsHandler)
 	rr := httptest.NewRecorder()
-	handlerFunc.ServeHTTP(rr, req)
+	s.serveHTTP(rr, req)
 
 	assert.Equal(t, http.StatusSeeOther, rr.Code)
 	assert.Equal(t, "/", rr.Header().Get("Location"))

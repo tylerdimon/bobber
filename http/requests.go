@@ -93,5 +93,4 @@ func (h *RequestHandler) DeleteAllRequestsHandler(w http.ResponseWriter, r *http
 
 	log.Println("All requests cleared")
 	http.Redirect(w, r, "", http.StatusSeeOther)
-
 }
