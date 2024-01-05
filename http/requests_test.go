@@ -19,6 +19,13 @@ func TestRecordRequestHandler(t *testing.T) {
 	mockRequestService := mocks.NewRequestService(t)
 	mockWebsocketService := mocks.NewWebsocketService(t)
 
+	s := Server{router: mux.NewRouter()}
+	handler := RequestHandler{
+		Service:          mockRequestService,
+		WebsocketService: mockWebsocketService,
+	}
+	handler.RegisterRequestRoutes(s.router)
+
 	requestToSave := bobber.Request{
 		Method:      "POST",
 		Host:        "",
@@ -39,13 +46,8 @@ func TestRecordRequestHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	handler := RequestHandler{
-		Service:          mockRequestService,
-		WebsocketService: mockWebsocketService,
-	}
-	handlerFunc := http.HandlerFunc(handler.RecordRequestHandler)
 	rr := httptest.NewRecorder()
-	handlerFunc.ServeHTTP(rr, req)
+	s.serveHTTP(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Equal(t, "a response", rr.Body.String())
@@ -55,6 +57,12 @@ func TestRequestIndexHandler(t *testing.T) {
 	static.ParseHTML()
 
 	mockRequestService := mocks.NewRequestService(t)
+
+	s := Server{router: mux.NewRouter()}
+	handler := RequestHandler{
+		Service: mockRequestService,
+	}
+	handler.RegisterRequestRoutes(s.router)
 
 	request1 := &bobber.Request{
 		ID:      mock.UUIDString,
@@ -80,21 +88,13 @@ func TestRequestIndexHandler(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	handler := RequestHandler{
-		Service: mockRequestService,
-	}
-	handlerFunc := http.HandlerFunc(handler.RequestIndexHandler)
 	rr := httptest.NewRecorder()
-	handlerFunc.ServeHTTP(rr, req)
+	s.serveHTTP(rr, req)
 
 	// TODO test order, timestamps
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Contains(t, rr.Body.String(), "GET /path")
 	assert.Contains(t, rr.Body.String(), "POST /another/path")
-}
-
-func setupServer() {
-
 }
 
 func TestDeleteAllRequestsHandler(t *testing.T) {
