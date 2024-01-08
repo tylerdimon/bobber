@@ -65,7 +65,7 @@ func (s *Server) Init() {
 	endpointHandler.RegisterEndpointRoutes(s.router)
 
 	requestHandler := &RequestHandler{}
-	requestHandler.Service = s.RequestService
+	requestHandler.RequestService = s.RequestService
 	requestHandler.WebsocketService = s.WebsocketService
 	requestHandler.RegisterRequestRoutes(s.router)
 

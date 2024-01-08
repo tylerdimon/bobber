@@ -2,8 +2,8 @@
     --black: #171614;
     --blue: #33658a;
     --orange: #c97c5d;
-    --bg-color: #eee2df;
-    --secondary-bg-color: #37423d;
+    --bg-color: #e2e2e2;
+    --secondary-bg-color: #d8d4d5;
     --space: 1rem
 }
 
@@ -53,11 +53,10 @@ footer {
 }
 
 .request-detail {
-    background-color: var(--secondary-bg-color);
-    color: var(--bg-color);
-    padding: calc(var(--space) / 2);
-
     display: flex;
-    gap: var(--space);
+    flex-direction: column;
     flex-wrap: wrap;
+
+    background-color: var(--secondary-bg-color);
+    padding: calc(var(--space) / 2);
 }

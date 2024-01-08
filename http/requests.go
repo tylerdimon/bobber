@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/tylerdimon/bobber"
 	"github.com/tylerdimon/bobber/static"
@@ -10,13 +11,17 @@ import (
 )
 
 type RequestHandler struct {
-	Service          bobber.RequestService
+	RequestService   bobber.RequestService
 	WebsocketService bobber.WebsocketService
 }
 
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
-	r.HandleFunc("/requests", h.DeleteAllRequestsHandler).Methods("DELETE")
+	r.HandleFunc("/request/{id}", h.detailHandler).Methods("GET")
+	r.HandleFunc("/request", h.DeleteAllRequestsHandler).Methods("DELETE")
+	r.HandleFunc("/request", h.RequestIndexHandler).Methods("GET")
+
 	r.PathPrefix("/requests/").HandlerFunc(h.RecordRequestHandler)
+
 	r.HandleFunc("/", h.RequestIndexHandler).Methods("GET")
 }
 
@@ -45,11 +50,11 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 		Headers: headers,
 	}
 
-	namespaceID, endpointID, response := h.Service.Match(request.Method, request.Path)
+	namespaceID, endpointID, response := h.RequestService.Match(request.Method, request.Path)
 	request.NamespaceID = namespaceID
 	request.EndpointID = endpointID
 
-	savedRequest, err := h.Service.Add(request)
+	savedRequest, err := h.RequestService.Add(request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -65,7 +70,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Request) {
-	requests, err := h.Service.GetAll()
+	requests, err := h.RequestService.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -86,11 +91,37 @@ func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *RequestHandler) DeleteAllRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	if err := h.Service.DeleteAll(); err != nil {
+	if err := h.RequestService.DeleteAll(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	log.Println("All requests cleared")
 	http.Redirect(w, r, "", http.StatusSeeOther)
+}
+
+func (h *RequestHandler) detailHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	req, err := h.RequestService.GetById(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	title := fmt.Sprintf("Request %s %s", req.Method, req.Path)
+
+	pageData := struct {
+		Title   string
+		Request *bobber.Request
+	}{
+		Title:   title,
+		Request: req,
+	}
+
+	err = static.RequestDetailTemplate.Execute(w, pageData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

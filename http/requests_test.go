@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/tylerdimon/bobber"
@@ -21,7 +22,7 @@ func TestRecordRequestHandler(t *testing.T) {
 
 	s := Server{router: mux.NewRouter()}
 	handler := RequestHandler{
-		Service:          mockRequestService,
+		RequestService:   mockRequestService,
 		WebsocketService: mockWebsocketService,
 	}
 	handler.RegisterRequestRoutes(s.router)
@@ -60,7 +61,7 @@ func TestRequestIndexHandler(t *testing.T) {
 
 	s := Server{router: mux.NewRouter()}
 	handler := RequestHandler{
-		Service: mockRequestService,
+		RequestService: mockRequestService,
 	}
 	handler.RegisterRequestRoutes(s.router)
 
@@ -102,14 +103,14 @@ func TestDeleteAllRequestsHandler(t *testing.T) {
 
 	mockRequestService := mocks.NewRequestService(t)
 	s := Server{router: mux.NewRouter()}
-	handler := RequestHandler{Service: mockRequestService}
+	handler := RequestHandler{RequestService: mockRequestService}
 	handler.RegisterRequestRoutes(s.router)
 
 	mockRequestService.EXPECT().DeleteAll().Return(nil).Once()
 
 	formData := url.Values{}
 	formData.Set("_method", "DELETE")
-	req, err := http.NewRequest("POST", "/requests", strings.NewReader(formData.Encode()))
+	req, err := http.NewRequest("POST", "/request", strings.NewReader(formData.Encode()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,4 +121,39 @@ func TestDeleteAllRequestsHandler(t *testing.T) {
 
 	assert.Equal(t, http.StatusSeeOther, rr.Code)
 	assert.Equal(t, "/", rr.Header().Get("Location"))
+}
+
+func TestRequestDetailHandler(t *testing.T) {
+	static.ParseHTML()
+
+	rs := mocks.NewRequestService(t)
+
+	s := Server{router: mux.NewRouter()}
+	handler := RequestHandler{
+		RequestService: rs,
+	}
+	handler.RegisterRequestRoutes(s.router)
+
+	r := &bobber.Request{
+		ID:      mock.UUIDString,
+		Method:  "GET",
+		Host:    "",
+		Path:    "/path",
+		Body:    "",
+		Headers: []bobber.Header{},
+	}
+
+	rs.EXPECT().GetById(mock.UUIDString).Return(r, nil).Once()
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("/request/%s", r.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rr := httptest.NewRecorder()
+	s.serveHTTP(rr, req)
+
+	// TODO test order, timestamps
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Contains(t, rr.Body.String(), "GET /path")
 }

@@ -18,6 +18,7 @@ var html embed.FS
 const baseTemplatePath = "html/base.html"
 const requestsIndexPath = "html/request-index.html"
 const singleRequestPath = "html/request-short.html"
+const requestDetailPath = "html/request-detail.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
@@ -26,6 +27,7 @@ const actionButtonPath = "html/components/action-button.html"
 var IndexTemplate *template.Template
 var ConfigTemplate *template.Template
 var RequestTemplate *template.Template
+var RequestDetailTemplate *template.Template
 var NamespaceAddTemplate *template.Template
 var EndpointAddTemplate *template.Template
 
@@ -38,6 +40,11 @@ func ParseHTML() {
 	}
 
 	RequestTemplate, err = template.New("requests").Funcs(sprig.FuncMap()).ParseFS(html, singleRequestPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	RequestDetailTemplate, err = template.New("base.html").Funcs(sprig.FuncMap()).ParseFS(html, baseTemplatePath, requestDetailPath)
 	if err != nil {
 		log.Fatal(err)
 	}

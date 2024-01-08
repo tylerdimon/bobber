@@ -1,15 +1,15 @@
-{{define "request"}}
+{{define "content"}}
 <div class="request-detail">
-    <span><strong>Method:</strong> {{.Method}}<br></span>
-        <span><strong>Host:</strong> {{.Host}}</span><br>
-    <span><strong>Path:</strong> {{.Path}}</span><br>
-    <span><strong>Timestamp:</strong> {{.Timestamp}}</span><br>
-        <span><strong>Body:</strong> {{.Body}}</span><br>
-        <span><strong>Headers:</strong></span><br>
-        <ul>
-            {{ range .Headers  }}
-                <li><strong>{{ .Name }}</strong>: {{ .Value }}</li>
-            {{ end }}
-        </ul>
+    <span><strong>Method:</strong> {{.Request.Method}}<br></span>
+    <span><strong>Host:</strong> {{.Request.Host}}</span><br>
+    <span><strong>Path:</strong> {{.Request.Path}}</span><br>
+    <span><strong>Timestamp:</strong> {{.Request.Timestamp}}</span><br>
+    <span><strong>Body:</strong> {{.Request.Body}}</span><br>
+    <span><strong>Headers:</strong></span><br>
+    <ul>
+        {{ range .Request.Headers  }}
+            <li><strong>{{ .Name }}</strong>: {{ .Value }}</li>
+        {{ end }}
+    </ul>
 </div>
 {{end}}
