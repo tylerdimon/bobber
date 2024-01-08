@@ -24,8 +24,6 @@
 </body>
 </html>
 <script>
-    document.getElementById("delete-requests").addEventListener("click", deleteRequests);
-
     var ws = new WebSocket("ws://localhost:8000/ws");
 
     ws.onmessage = function(event) {

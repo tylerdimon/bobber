@@ -2,7 +2,7 @@
 
 <h2>All Requests</h2>
 {{template "action-button" (dict "Action" "/requests" "Method" "DELETE" "ButtonText" "Delete All Requests")}}
-<div class="stack">
+<div id="requestList" class="stack">
     {{range .Data}}
         {{template "request" .}}
     {{end}}

@@ -1,5 +1,5 @@
 function addRequestToList(message) {
-    var list = document.getElementById("request-list");
+    var list = document.getElementById("requestList");
     list.innerHTML = message + list.innerHTML
 }
 
