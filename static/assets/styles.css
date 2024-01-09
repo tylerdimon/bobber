@@ -15,18 +15,23 @@ body {
     margin: auto;
 }
 
+footer {
+    border-top: 1px solid var(--black);
+    font-size: 0.8em;
+}
+
 h1 {
     color: var(--orange);
 }
 
 nav {
     display: flex;
-    gap: 15px;
+    gap: var(--space);
+    font-size: 1.25rem;
 }
 
-nav a {
+a {
     color: var(--blue);
-    font-size: 1.25em;
 }
 
 .stack {
@@ -47,10 +52,6 @@ nav a {
 .box {
     background-color: var(--secondary-bg-color);
     padding: calc(var(--space) / 2);
-}
-
-.margin-0 {
-    margin: 0;
 }
 
 .flex {

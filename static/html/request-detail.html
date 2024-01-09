@@ -1,5 +1,5 @@
 {{define "content"}}
-<div class="box">
+<div class="box" style="margin-bottom: var(--space);">
     <span><strong>Method:</strong> {{.Request.Method}}<br></span>
     <span><strong>Host:</strong> {{.Request.Host}}</span><br>
     <span><strong>Path:</strong> {{.Request.Path}}</span><br>
@@ -7,9 +7,9 @@
     <span><strong>Body:</strong> {{.Request.Body}}</span><br>
     <span><strong>Headers:</strong></span><br>
     <ul>
-        {{ range .Request.Headers  }}
-            <li><strong>{{ .Name }}</strong>: {{ .Value }}</li>
-        {{ end }}
+        {{range .Request.Headers}}
+            <li><strong>{{.Name}}</strong>: {{.Value}}</li>
+        {{end}}
     </ul>
 </div>
 {{end}}
