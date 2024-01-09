@@ -1,18 +1,12 @@
 {{define "request"}}
-<div class="request-detail">
+<div class="box flex-space">
     <div>
-        <strong>{{.Method}} {{.Path}}</strong>
-    </div>
-    <div>
+        <h4 class="margin-0">{{.Method}} {{.Path}}</h4>
         <small>{{ dateInZone "01-02-2006 3:04:05PM MST" (.Timestamp) "UTC" }}</small>
     </div>
-    <div>
-<!--        <button>Details</button>-->
-<!--        <button>Delete</button>-->
-        {{ $id := .ID }}
+    <div class="flex">
         <a href="/request/{{ .ID }}">Details</a>
-<!--        {{template "action-button" (dict "Action" (printf "/request/%s" $id) "Method" "GET" "ButtonText" "Detail")}}-->
-        {{template "action-button" (dict "Action" (printf "/request/%s" $id) "Method" "DELETE" "ButtonText" "Delete")}}
+        {{template "action-button" (dict "Action" (printf "/request/%s" .ID) "Method" "DELETE" "ButtonText" "Delete")}}
     </div>
 </div>
 {{end}}

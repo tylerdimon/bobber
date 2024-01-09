@@ -17,6 +17,8 @@ type RequestHandler struct {
 
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
 	r.HandleFunc("/request/{id}", h.detailHandler).Methods("GET")
+	r.HandleFunc("/request/{id}", h.detailHandler).Methods("DELETE")
+
 	r.HandleFunc("/request", h.DeleteAllRequestsHandler).Methods("DELETE")
 	r.HandleFunc("/request", h.RequestIndexHandler).Methods("GET")
 

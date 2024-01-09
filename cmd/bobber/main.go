@@ -15,7 +15,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 
 	db := sqlite.NewDB("bobber.sqlite?parseTime=true")
 	if err := db.Open(); err != nil {

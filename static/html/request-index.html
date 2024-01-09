@@ -1,7 +1,7 @@
 {{define "content"}}
 
 <h2>All Requests</h2>
-{{template "action-button" (dict "Action" "/requests" "Method" "DELETE" "ButtonText" "Delete All Requests")}}
+{{template "action-button" (dict "Action" "/request" "Method" "DELETE" "ButtonText" "Delete All Requests")}}
 <div id="requestList" class="stack">
     {{range .Data}}
         {{template "request" .}}

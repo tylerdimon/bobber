@@ -39,7 +39,7 @@ func ParseHTML() {
 		log.Fatal(err)
 	}
 
-	RequestTemplate, err = template.New("requests").Funcs(sprig.FuncMap()).ParseFS(html, singleRequestPath)
+	RequestTemplate, err = template.New("requests").Funcs(sprig.FuncMap()).ParseFS(html, singleRequestPath, actionButtonPath)
 	if err != nil {
 		log.Fatal(err)
 	}
