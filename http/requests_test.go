@@ -157,3 +157,31 @@ func TestRequestDetailHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 	assert.Contains(t, rr.Body.String(), "GET /path")
 }
+
+func TestDeleteRequestHandler(t *testing.T) {
+	static.ParseHTML()
+
+	rs := mocks.NewRequestService(t)
+
+	s := Server{router: mux.NewRouter()}
+	handler := RequestHandler{
+		RequestService: rs,
+	}
+	handler.RegisterRequestRoutes(s.router)
+
+	rs.EXPECT().DeleteById(mock.UUIDString).Return(nil, nil).Once()
+
+	formData := url.Values{}
+	formData.Set("_method", "DELETE")
+	req, err := http.NewRequest("POST", fmt.Sprintf("/request/%s", mock.UUIDString), strings.NewReader(formData.Encode()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+	s.serveHTTP(rr, req)
+
+	assert.Equal(t, http.StatusSeeOther, rr.Code)
+	assert.Equal(t, "/", rr.Header().Get("Location"))
+}

@@ -16,8 +16,8 @@ type RequestHandler struct {
 }
 
 func (h *RequestHandler) RegisterRequestRoutes(r *mux.Router) {
+	r.HandleFunc("/request/{id}", h.deleteHandler).Methods("DELETE")
 	r.HandleFunc("/request/{id}", h.detailHandler).Methods("GET")
-	r.HandleFunc("/request/{id}", h.detailHandler).Methods("DELETE")
 
 	r.HandleFunc("/request", h.DeleteAllRequestsHandler).Methods("DELETE")
 	r.HandleFunc("/request", h.RequestIndexHandler).Methods("GET")
@@ -126,4 +126,17 @@ func (h *RequestHandler) detailHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func (h *RequestHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	if _, err := h.RequestService.DeleteById(id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Request %s deleted", id)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
