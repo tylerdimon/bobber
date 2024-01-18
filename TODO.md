@@ -1,7 +1,6 @@
 ## TODO
 
-- request detail
-- delete individual request
+- add constants for paths
 - support for headers
 
 

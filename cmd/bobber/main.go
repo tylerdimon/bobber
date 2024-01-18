@@ -31,6 +31,7 @@ func main() {
 
 	namespaceService := &sqlite.NamespaceService{}
 	namespaceService.DB = db
+	namespaceService.Gen = generator
 
 	endpointService := &sqlite.EndpointService{}
 	endpointService.DB = db

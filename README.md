@@ -54,6 +54,13 @@ go install gotest.tools/gotestsum@latest
 gotestsum --format dots
 ```
 
+### Coverage
+
+```shell
+ go test ./... -coverprofile=c.out
+go tool cover -html=c.out
+```
+
 ### Formatting
 
 Use `Gofmt` for formatting

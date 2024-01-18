@@ -62,5 +62,5 @@ func (h *EndpointHandler) endpointDetailHandler(w http.ResponseWriter, r *http.R
 	// Print the namespace info. In a real application, you might save it to a database.
 	log.Printf("Endpoint Added: %+v", added)
 
-	http.Redirect(w, r, fmt.Sprintf("/config/namespace/%v", namespaceID), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/namespace/%v", namespaceID), http.StatusSeeOther)
 }
