@@ -17,8 +17,8 @@ func populateRequests(db *DB) {
 	defer tx.Commit()
 
 	stmt, err := tx.Prepare(`
-		INSERT INTO requests (id, method, host, path, timestamp, body, headers) 
-		VALUES (?, ?, ?, ?, ?, ?, ?)`)
+		INSERT INTO requests (id, method, host, path, timestamp, body, headers, response) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,6 +31,7 @@ func populateRequests(db *DB) {
 		Host:      "google.com",
 		Path:      "/path/one",
 		Body:      "",
+		Response:  "response1",
 	}
 
 	request2 := bobber.Request{
@@ -40,14 +41,15 @@ func populateRequests(db *DB) {
 		Host:      "example.com",
 		Path:      "/path/two",
 		Body:      "some body text",
+		Response:  "response2",
 	}
 
-	_, err = stmt.Exec(request1.ID, request1.Method, request1.Host, request1.Path, request1.Timestamp, request1.Body, "")
+	_, err = stmt.Exec(request1.ID, request1.Method, request1.Host, request1.Path, request1.Timestamp, request1.Body, "", request1.Response)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = stmt.Exec(request2.ID, request2.Method, request2.Host, request2.Path, request2.Timestamp, request2.Body, "")
+	_, err = stmt.Exec(request2.ID, request2.Method, request2.Host, request2.Path, request2.Timestamp, request2.Body, "", request2.Response)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,6 +82,7 @@ func TestRequestGetById(t *testing.T) {
 				Timestamp: mock.ParseTime(mock.TimestampString),
 				Body:      "",
 				Headers:   nil,
+				Response:  "response1",
 			},
 			wantErr: false,
 		},
@@ -122,6 +125,7 @@ func TestRequestGetAll(t *testing.T) {
 			Timestamp: mock.ParseTime("2009-11-10 23:00:01 +0000 UTC"),
 			Body:      "some body text",
 			Headers:   nil,
+			Response:  "response2",
 		},
 		{
 			ID:        mock.UUIDString,
@@ -131,6 +135,7 @@ func TestRequestGetAll(t *testing.T) {
 			Timestamp: mock.ParseTime(mock.TimestampString),
 			Body:      "",
 			Headers:   nil,
+			Response:  "response1",
 		},
 	}
 

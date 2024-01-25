@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS requests (
     headers  TEXT,
     namespace_id  TEXT,
     endpoint_id  TEXT,
+    response  TEXT,
     FOREIGN KEY (namespace_id) REFERENCES namespaces(id),
     FOREIGN KEY (endpoint_id) REFERENCES endpoints(id)
 );

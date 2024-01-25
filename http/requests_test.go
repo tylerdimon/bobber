@@ -34,6 +34,7 @@ func TestRecordRequestHandler(t *testing.T) {
 		Body:        `{"some":"json","body":"values"}`,
 		NamespaceID: "1234",
 		EndpointID:  "4567",
+		Response:    "a response",
 	}
 	savedRequest := &bobber.Request{}
 

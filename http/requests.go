@@ -55,6 +55,11 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 	namespaceID, endpointID, response := h.RequestService.Match(request.Method, request.Path)
 	request.NamespaceID = namespaceID
 	request.EndpointID = endpointID
+	if response == "" {
+		request.Response = "Request received"
+	} else {
+		request.Response = response
+	}
 
 	savedRequest, err := h.RequestService.Add(request)
 	if err != nil {
@@ -64,11 +69,7 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 
 	h.WebsocketService.Broadcast(savedRequest)
 
-	if response == "" {
-		w.Write([]byte("Request received"))
-	} else {
-		w.Write([]byte(response))
-	}
+	w.Write([]byte(request.Response))
 }
 
 func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Request) {

@@ -15,6 +15,7 @@ type Request struct {
 	EndpointID     string    `db:"endpoint_id"`
 	EndpointMethod string    `db:"endpoint_method"`
 	EndpointPath   string    `db:"endpoint_path"`
+	Response       string    `db:"response"`
 }
 
 type Header struct {

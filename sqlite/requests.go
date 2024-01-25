@@ -26,7 +26,7 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	var ts string
 
 	err := rows.Scan(&r.ID, &r.Method, &r.Host, &r.Path, &ts, &r.Body,
-		&headersJSON, &namespaceId, &endpointID, &namespaceName)
+		&headersJSON, &namespaceId, &endpointID, &namespaceName, &r.Response)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -56,7 +56,7 @@ func scan(rows Scannable) (*bobber.Request, error) {
 func (s *RequestService) GetById(id string) (*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
-	   r.headers, r.namespace_id, r.endpoint_id, n.name 
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, r.response
 FROM requests r 
 LEFT JOIN namespaces n on r.namespace_id = n.id 
 WHERE r.id = ?;`
@@ -73,7 +73,7 @@ WHERE r.id = ?;`
 func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
-	   r.headers, r.namespace_id, r.endpoint_id, n.name
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, r.response
 FROM requests r
 LEFT JOIN namespaces n on r.namespace_id = n.id
 ORDER BY r.timestamp DESC;`
@@ -104,6 +104,8 @@ ORDER BY r.timestamp DESC;`
 }
 
 func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
+	log.Printf("Saving request to database %v", request)
+
 	request.ID = s.Gen.UUID().String()
 	request.Timestamp = s.Gen.Now()
 
@@ -112,7 +114,7 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 		log.Fatal(err)
 	}
 
-	stmt, err := s.DB.conn.Prepare(`INSERT INTO requests (id, method, host, path, timestamp, body, headers, namespace_id, endpoint_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	stmt, err := s.DB.conn.Prepare(`INSERT INTO requests (id, method, host, path, timestamp, body, headers, namespace_id, endpoint_id, response) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if err != nil {
 		log.Printf("Error preparing statement - Request %v : %v", request, err)
 		return nil, err
@@ -128,18 +130,20 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 	}
 
 	var endpointId sql.NullString
-	if request.NamespaceID == "" {
+	if request.EndpointID == "" {
 		endpointId.Valid = false
 	} else {
 		endpointId.Valid = true
 		endpointId.String = request.EndpointID
 	}
 
-	_, err = stmt.Exec(request.ID, request.Method, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), namespaceId, endpointId)
+	_, err = stmt.Exec(request.ID, request.Method, request.Host, request.Path, request.Timestamp, request.Body, string(headersJSON), namespaceId, endpointId, request.Response)
 	if err != nil {
 		log.Printf("Error saving request to database - Request %v : %v", request, err)
 		return nil, err
 	}
+
+	request.NamespaceName = s.getNamespaceName(request.NamespaceID)
 
 	return &request, nil
 }
@@ -178,13 +182,13 @@ func (s *RequestService) Match(method string, path string) (namespaceID, endpoin
 
 func (s *RequestService) matchNamespace(slug string) (namespaceID string) {
 	log.Printf("Looking for namespace match for slug %s", slug)
-
 	var id string
-	err := s.DB.conn.Get(&id, " SELECT id FROM namespaces WHERE slug = ?", slug)
+	err := s.DB.conn.Get(&id, "SELECT id FROM namespaces WHERE slug = ?", slug)
 	if err != nil {
 		log.Print(err)
 		return ""
 	}
+	log.Printf("Got a namespace match for slug '%s': %s", slug, id)
 	return id
 }
 
@@ -201,4 +205,14 @@ func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpoi
 		}
 	}
 	return endpoint.ID, endpoint.Response
+}
+
+func (s *RequestService) getNamespaceName(namespaceId string) string {
+	query := `SELECT name FROM namespaces WHERE id = ?`
+	var name string
+	if err := s.DB.conn.QueryRow(query, namespaceId).Scan(&name); err != nil {
+		log.Printf("Unexpected error getting name for namespace %s: %s", namespaceId, err)
+		return ""
+	}
+	return name
 }
