@@ -1,14 +1,31 @@
 {{define "request"}}
-<div class="box flex-space">
-    <div>
-        <h4 style="margin: 0;">{{.Method}} {{.Path}}</h4>
-        <small>{{dateInZone "01-02-2006 3:04:05PM MST" (.Timestamp) "UTC"}}</small>
-        <p>{{ .Response }}</p>
+<div class="box">
+    <div class="flex-space">
+        <div class="flex">
+            <div>
+                <b>{{.Method}} {{.Path}}</b>
+            </div>
+            {{if .NamespaceName}}
+                <div>
+                    <b>Namespace:</b> <a href="#">{{.NamespaceName}}</a>
+                </div>
+            {{end}}
+            {{if .EndpointName}}
+                <div>
+                    <b>Endpoint:</b> <a href="#">{{.EndpointName}}</a>
+                </div>
+            {{end}}
+            <div>
+                <small>{{dateInZone "01-02-2006 3:04:05PM MST" (.Timestamp) "UTC"}}</small>
+            </div>
+        </div>
+        <div class="flex">
+            <a href="/request/{{.ID}}">Details</a>
+            {{template "action-button" (dict "Action" (printf "/request/%s" .ID) "Method" "DELETE" "ButtonText" "Delete")}}
+        </div>
     </div>
-    <div class="flex">
-        <p>Namespace: <a href="#">{{ .NamespaceName }}</a></p>
-        <a href="/request/{{.ID}}">Details</a>
-        {{template "action-button" (dict "Action" (printf "/request/%s" .ID) "Method" "DELETE" "ButtonText" "Delete")}}
+    <div>
+        {{ .Response }}
     </div>
 </div>
 {{end}}

@@ -2,6 +2,7 @@ package bobber
 
 type Endpoint struct {
 	ID          string `db:"id"`
+	Name        string `db:"name"`
 	Method      string `db:"method"`
 	Path        string `db:"path"`
 	Response    string `db:"response"`

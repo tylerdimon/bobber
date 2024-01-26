@@ -22,8 +22,8 @@ func (s *EndpointService) GetAll() ([]bobber.Endpoint, error) {
 func (s *EndpointService) Add(endpoint bobber.Endpoint) (*bobber.Endpoint, error) {
 	endpoint.ID = uuid.New().String()
 	endpoint.CreatedAt = time.Now().String()
-	result, err := s.DB.conn.NamedExec(`INSERT INTO endpoints (id, method, path, response, namespace_id, created_at) 
-                                    VALUES (:id, :method, :path, :response, :namespace_id, :created_at)`, &endpoint)
+	result, err := s.DB.conn.NamedExec(`INSERT INTO endpoints (id, name, method, path, response, namespace_id, created_at) 
+                                    VALUES (:id, :name, :method, :path, :response, :namespace_id, :created_at)`, &endpoint)
 	if err != nil {
 		log.Print(err)
 		return nil, err

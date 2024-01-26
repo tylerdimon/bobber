@@ -13,6 +13,7 @@ type Request struct {
 	NamespaceID    string    `db:"namespace_id"`
 	NamespaceName  string    `db:"namespace_name"`
 	EndpointID     string    `db:"endpoint_id"`
+	EndpointName   string    `db:"endpoint_name"`
 	EndpointMethod string    `db:"endpoint_method"`
 	EndpointPath   string    `db:"endpoint_path"`
 	Response       string    `db:"response"`

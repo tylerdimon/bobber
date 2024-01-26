@@ -23,10 +23,11 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	var namespaceId sql.NullString
 	var namespaceName sql.NullString
 	var endpointID sql.NullString
+	var endpointName sql.NullString
 	var ts string
 
 	err := rows.Scan(&r.ID, &r.Method, &r.Host, &r.Path, &ts, &r.Body,
-		&headersJSON, &namespaceId, &endpointID, &namespaceName, &r.Response)
+		&headersJSON, &namespaceId, &endpointID, &namespaceName, &endpointName, &r.Response)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -43,6 +44,7 @@ func scan(rows Scannable) (*bobber.Request, error) {
 	r.NamespaceID = Unwrap(namespaceId)
 	r.NamespaceName = Unwrap(namespaceName)
 	r.EndpointID = Unwrap(endpointID)
+	r.EndpointName = Unwrap(endpointName)
 
 	timestamp, err := ParseTime(ts)
 	if err != nil {
@@ -56,9 +58,10 @@ func scan(rows Scannable) (*bobber.Request, error) {
 func (s *RequestService) GetById(id string) (*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
-	   r.headers, r.namespace_id, r.endpoint_id, n.name, r.response
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, e.name, r.response
 FROM requests r 
 LEFT JOIN namespaces n on r.namespace_id = n.id 
+LEFT JOIN endpoints e on r.endpoint_id = e.id
 WHERE r.id = ?;`
 
 	r, err := scan(s.DB.conn.QueryRow(query, id))
@@ -73,9 +76,10 @@ WHERE r.id = ?;`
 func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
-	   r.headers, r.namespace_id, r.endpoint_id, n.name, r.response
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, e.name, r.response
 FROM requests r
 LEFT JOIN namespaces n on r.namespace_id = n.id
+LEFT JOIN endpoints e on r.endpoint_id = e.id
 ORDER BY r.timestamp DESC;`
 
 	rows, err := s.DB.conn.Query(query)
@@ -143,7 +147,12 @@ func (s *RequestService) Add(request bobber.Request) (*bobber.Request, error) {
 		return nil, err
 	}
 
-	request.NamespaceName = s.getNamespaceName(request.NamespaceID)
+	if request.NamespaceID != "" {
+		request.NamespaceName = s.getNamespaceName(request.NamespaceID)
+		if request.EndpointID != "" {
+			request.EndpointName = s.getEndpointName(request.EndpointID)
+		}
+	}
 
 	return &request, nil
 }
@@ -193,6 +202,7 @@ func (s *RequestService) matchNamespace(slug string) (namespaceID string) {
 }
 
 func (s *RequestService) matchEndpoint(namespaceID, method, path string) (endpointID, response string) {
+	log.Printf("Matching endpoint for namespace %s and request %s %s...", namespaceID, method, path)
 	var endpoint bobber.Endpoint
 	err := s.DB.conn.Get(&endpoint, " SELECT id, response FROM endpoints WHERE namespace_id = ? AND method = ? AND PATH = ?", namespaceID, method, path)
 	if err != nil {
@@ -212,6 +222,16 @@ func (s *RequestService) getNamespaceName(namespaceId string) string {
 	var name string
 	if err := s.DB.conn.QueryRow(query, namespaceId).Scan(&name); err != nil {
 		log.Printf("Unexpected error getting name for namespace %s: %s", namespaceId, err)
+		return ""
+	}
+	return name
+}
+
+func (s *RequestService) getEndpointName(endpointId string) string {
+	query := `SELECT name FROM endpoints WHERE id = ?`
+	var name string
+	if err := s.DB.conn.QueryRow(query, endpointId).Scan(&name); err != nil {
+		log.Printf("Unexpected error getting name for endpoint %s: %s", endpointId, err)
 		return ""
 	}
 	return name

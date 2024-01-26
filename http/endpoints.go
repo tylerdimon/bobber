@@ -46,6 +46,7 @@ func (h *EndpointHandler) endpointDetailHandler(w http.ResponseWriter, r *http.R
 	}
 
 	endpoint := bobber.Endpoint{
+		Name:        r.FormValue("name"),
 		Method:      r.FormValue("method"),
 		Path:        r.FormValue("path"),
 		Response:    r.FormValue("response"),
