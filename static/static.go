@@ -6,6 +6,7 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/tylerdimon/bobber"
 	"html/template"
+	"io"
 	"log"
 )
 
@@ -24,12 +25,26 @@ const namespaceAddPath = "html/namespace-detail.html"
 const endpointAddPath = "html/endpoint-add.html"
 const actionButtonPath = "html/components/action-button.html"
 
-var IndexTemplate *template.Template
-var ConfigTemplate *template.Template
-var RequestTemplate *template.Template
-var RequestDetailTemplate *template.Template
-var NamespaceAddTemplate *template.Template
-var EndpointAddTemplate *template.Template
+type Executable interface {
+	Execute(io.Writer, any) error
+	ExecuteTemplate(io.Writer, string, any) error
+}
+
+var IndexTemplate Executable
+var ConfigTemplate Executable
+var RequestTemplate Executable
+var RequestDetailTemplate Executable
+var NamespaceAddTemplate Executable
+var EndpointAddTemplate Executable
+
+type Reloader struct {
+	templateGenerator func() *template.Template
+}
+
+func (r *Reloader) Execute(wr io.Writer, data any) error {
+	htmlTemplate := r.templateGenerator()
+	return htmlTemplate.Execute(wr, data)
+}
 
 func ParseHTML() {
 	var err error
@@ -65,6 +80,7 @@ func ParseHTML() {
 	}
 }
 
+// GetRequestHTML used to generate HTML pushed over websocket
 func GetRequestHTML(request *bobber.Request) ([]byte, error) {
 	var buf bytes.Buffer
 	err := RequestTemplate.ExecuteTemplate(&buf, "request", request)

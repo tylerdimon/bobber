@@ -15,11 +15,12 @@ type EndpointHandler struct {
 }
 
 func (h *EndpointHandler) RegisterEndpointRoutes(r *mux.Router) {
-	r.HandleFunc("/config/namespace/{id}/endpoint", h.endpointDetailHandler)
-	r.HandleFunc("/config/endpoint/{id}", h.endpointDetailHandler)
+	r.HandleFunc("/namespace/{id}/endpoint/{id}/delete", h.deleteById).Methods("GET")
+	r.HandleFunc("/namespace/{id}/endpoint/{id}", h.detail).Methods("GET")
+	r.HandleFunc("/namespace/{id}/endpoint", h.detail).Methods("POST")
 }
 
-func (h *EndpointHandler) endpointDetailHandler(w http.ResponseWriter, r *http.Request) {
+func (h *EndpointHandler) detail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	namespaceID := vars["id"]
 
@@ -64,4 +65,18 @@ func (h *EndpointHandler) endpointDetailHandler(w http.ResponseWriter, r *http.R
 	log.Printf("Endpoint Added: %+v", added)
 
 	http.Redirect(w, r, fmt.Sprintf("/namespace/%v", namespaceID), http.StatusSeeOther)
+}
+
+func (h *EndpointHandler) deleteById(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	log.Printf("Handling delete request for Namespace %s", id)
+
+	err := h.EndpointService.DeleteById(id)
+	if err != nil {
+		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/config", http.StatusSeeOther)
 }

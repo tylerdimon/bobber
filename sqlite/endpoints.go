@@ -38,3 +38,13 @@ func (s *EndpointService) Add(endpoint bobber.Endpoint) (*bobber.Endpoint, error
 	endpoint.ID = strconv.Itoa(int(id))
 	return &endpoint, nil
 }
+
+func (s *EndpointService) DeleteById(id string) error {
+	log.Printf("Deleting namespace %s", id)
+	_, err := s.DB.conn.NamedExec("DELETE FROM endpoints WHERE id = $1", id)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	return nil
+}

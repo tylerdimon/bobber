@@ -29,6 +29,12 @@ go build ./cmd/bobber
 ./bobber
 ```
 
+UI runs on `localhost:8000` by default
+
+Listening for requests at `locahost:8000/requests/`
+
+### Testing
+
 This project includes both Javascript and Go tests.
 
 #### Javascript

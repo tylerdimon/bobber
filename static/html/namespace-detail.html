@@ -30,7 +30,12 @@
 <a href="/config/namespace/{{.Namespace.ID}}/endpoint">Add</a>
 <ul id="endpoints">
     {{range .Endpoints}}
-    <li>{{.Method}} {{.Path}} | <a href="#">View Endpoint</a> | <a href="/config/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Edit</a></li>
+    <li>
+        {{.Method}} {{.Path}} |
+        <a href="#">View Endpoint</a> |
+        <a href="/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Edit</a>
+        <a href="/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Delete</a>
+    </li>
     {{end}}
 </ul>
 {{end}}
