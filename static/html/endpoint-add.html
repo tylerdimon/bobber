@@ -1,25 +1,34 @@
 {{define "content"}}
 <h2>Add New Endpoint</h2>
-<form action="/namespace/{{.NamespaceID}}/endpoint" method="post">
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name" required><br>
+<form action="/namespace/{{.NamespaceID}}/endpoint" method="post" class="stack">
 
-    <label for="method">Method:</label><br>
-    <select id="method" name="method" required>
-        <option>GET</option>
-        <option>POST</option>
-        <option>PUT</option>
-        <option>PATCH</option>
-        <option>DELETE</option>
-        <option>HEAD</option>
-        <option>*</option>
-    </select>
+    <div class="form-element">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
 
-    <label for="path">Path:</label><br>
-    <input type="text" id="path" name="path" required><br>
+    <div class="form-element">
+        <label for="method">Method:</label>
+        <select id="method" name="method" required>
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+            <option>HEAD</option>
+            <option>*</option>
+        </select>
+    </div>
 
-    <label for="response">Response:</label><br>
-    <textarea id="response" name="response" required></textarea><br>
+    <div class="form-element">
+        <label for="path">Path:</label>
+        <input type="text" id="path" name="path" placeholder="/users" required>
+    </div>
+
+    <div class="form-element-textarea">
+        <label for="response">Response:</label><br>
+        <textarea id="response" name="response" rows="10" cols="50" required></textarea>
+    </div>
 
     <input type="submit" value="Submit">
 </form>

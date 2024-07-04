@@ -2,24 +2,35 @@
 <h2>{{.Title}}</h2>
 
 {{if .Namespace}}
-<form action="/namespace/{{.Namespace.ID}}" method="post">
+<form action="/namespace/{{.Namespace.ID}}" method="post" class="stack">
     <input type="hidden" name="_method" value="PUT" />
 
-    <label for="slug">Slug:</label><br>
-    <input type="text" id="slug" name="slug" value="{{.Namespace.Slug}}" required><br>
+    <div class="form-element">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{.Namespace.Name}}" required>
+    </div>
 
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name" value="{{.Namespace.Name}}" required><br>
+    <div class="form-element">
+        <span>
+            <label for="slug">Slug:</label>
+            <small>Ex: /requests/slug/endpoint</small>
+        </span>
+        <input type="text" id="slug" name="slug" value="{{.Namespace.Slug}}" required>
+    </div>
 
     <input type="submit" value="Save">
 </form>
 {{else}}
-<form action="/namespace" method="post">
-    <label for="slug">Slug:</label><br>
-    <input type="text" id="slug" name="slug" required><br>
+<form action="/namespace" method="post" class="stack">
+    <div class="form-element">
+        <label for="slug">Slug:</label>
+        <input type="text" id="slug" name="slug" required>
+    </div>
 
-    <label for="name">Name:</label><br>
-    <input type="text" id="name" name="name" required><br>
+    <div class="form-element">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+    </div>
 
     <input type="submit" value="Add">
 </form>
@@ -27,14 +38,15 @@
 
 {{if .Namespace}}
 <h3>Endpoints</h3>
-<a href="/config/namespace/{{.Namespace.ID}}/endpoint">Add</a>
+<a href="/namespace/{{.Namespace.ID}}/endpoint">Add</a>
 <ul id="endpoints">
+    {{ $namespaceId := .Namespace.ID }}
     {{range .Endpoints}}
     <li>
         {{.Method}} {{.Path}} |
-        <a href="#">View Endpoint</a> |
-        <a href="/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Edit</a>
-        <a href="/namespace/{{.NamespaceID}}/endpoint/{{.ID}}">Delete</a>
+        <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}/requests">Incoming Requests</a> |
+        <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}">Edit</a> |
+        <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}/delete">Delete</a>
     </li>
     {{end}}
 </ul>

@@ -67,3 +67,17 @@ a {
     flex-wrap: wrap;
     justify-content: space-between;
 }
+
+.form-element {
+    display: flex;
+    justify-content: space-between;
+    max-width: 400px;
+}
+
+input[type=submit] {
+    max-width: 100px;
+}
+
+form small {
+    color: darkgray;
+}
