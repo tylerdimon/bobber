@@ -1,5 +1,7 @@
 ## TODO
 
+/request/test -> errors out
+
 - endpoint edit, delete
 - import / export namespaces and endpoints to JSON
   - should be able to just use default json marshalling

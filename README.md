@@ -6,23 +6,9 @@ It replaces real APIs in a way that lets your application keep working while mak
 Swap a Bobber URL with an API URL to start sending requests. Bobber will record all requests and send a response.
 Responses can be static or dynamic based on request data.
 
-## Use
+The README focuses on development, for information on using bobber go to [doc.md](doc.md)
 
-### Install
-
-Work in progress, for now [building](#Build) is required
-
-### Setup
-
-The first step is creating a namespace.
-Think of each namespace as a different API to be mocked out. 
-This helps avoid conflicts with common endpoints like `/users` or `/token`.
-
-Each name space will get a slug, for example `really-cool-api`. A namespace with that slug will expect requests at `/requests/really-cool-api/`.
-
-## Develop
-
-To build and run
+## Build & run
 
 ```bash
 go build ./cmd/bobber
@@ -33,18 +19,18 @@ UI runs on `localhost:8000` by default
 
 Listening for requests at `locahost:8000/requests/`
 
-### Testing
+## Testing
 
 This project includes both Javascript and Go tests.
 
-#### Javascript
+### Javascript
 
 ```
 npm ci
 npm test
 ```
 
-#### Go
+### Go
 
 Mocks
 
@@ -60,7 +46,7 @@ go install gotest.tools/gotestsum@latest
 gotestsum --format dots
 ```
 
-### Coverage
+Coverage
 
 ```shell
  go test ./... -coverprofile=c.out
@@ -68,8 +54,6 @@ go tool cover -html=c.out
 ```
 
 ### Formatting
-
-Use `Gofmt` for formatting
 
 ```
 go fmt ./...
