@@ -1,7 +1,43 @@
 {{define "content"}}
-<h2>Add New Endpoint</h2>
-<form action="/namespace/{{.NamespaceID}}/endpoint" method="post" class="stack">
 
+{{if .Endpoint}}
+<h2>Update Endpoint</h2>
+<form action="/namespace/{{.NamespaceID}}/endpoint/{{.Endpoint.ID}}" method="post" class="stack">
+    <input type="hidden" name="_method" value="PUT" />
+
+    <div class="form-element">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{.Endpoint.Name}}" required>
+    </div>
+
+    <div class="form-element">
+        <label for="method">Method:</label>
+        <select id="method" name="method" value="{{.Endpoint.Method}}" required>
+            <option>GET</option>
+            <option>POST</option>
+            <option>PUT</option>
+            <option>PATCH</option>
+            <option>DELETE</option>
+            <option>HEAD</option>
+            <option>*</option>
+        </select>
+    </div>
+
+    <div class="form-element">
+        <label for="path">Path:</label>
+        <input type="text" id="path" name="path" placeholder="/users" value="{{.Endpoint.Path}}" required>
+    </div>
+
+    <div class="form-element-textarea">
+        <label for="response">Response:</label><br>
+        <textarea id="response" name="response" rows="10" cols="50" required>{{.Endpoint.Response}}</textarea>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+{{else}}
+<h2>Add Endpoint</h2>
+<form action="/namespace/{{.NamespaceID}}/endpoint" method="post" class="stack">
     <div class="form-element">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
@@ -32,4 +68,5 @@
 
     <input type="submit" value="Submit">
 </form>
+{{end}}
 {{end}}

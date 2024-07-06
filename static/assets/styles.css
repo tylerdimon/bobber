@@ -75,7 +75,7 @@ a {
 }
 
 input[type=submit] {
-    max-width: 100px;
+    max-width: 150px;
 }
 
 form small {

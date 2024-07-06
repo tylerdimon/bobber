@@ -13,6 +13,8 @@ type Endpoint struct {
 
 type EndpointService interface {
 	GetAll() ([]Endpoint, error)
+	GetById(string) (*Endpoint, error)
 	Add(request Endpoint) (*Endpoint, error)
+	Update(request Endpoint) (*Endpoint, error)
 	DeleteById(id string) error
 }

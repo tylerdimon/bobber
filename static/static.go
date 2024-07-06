@@ -22,7 +22,7 @@ const singleRequestPath = "html/request-short.html"
 const requestDetailPath = "html/request-detail.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
-const endpointAddPath = "html/endpoint-add.html"
+const endpointAddPath = "html/endpoint-detail.html"
 const actionButtonPath = "html/components/action-button.html"
 
 type Executable interface {

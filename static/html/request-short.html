@@ -7,12 +7,12 @@
             </div>
             {{if .NamespaceName}}
                 <div>
-                    <b>Namespace:</b> <a href="#">{{.NamespaceName}}</a>
+                    <b>Namespace:</b> <a href="/namespace/{{.NamespaceID}}">{{.NamespaceName}}</a>
                 </div>
             {{end}}
             {{if .EndpointName}}
                 <div>
-                    <b>Endpoint:</b> <a href="#">{{.EndpointName}}</a>
+                    <b>Endpoint:</b> <a href="/namespace/{{.NamespaceID}}//endpoint/{{.EndpointID}}">{{.EndpointName}}</a>
                 </div>
             {{end}}
             <div>
