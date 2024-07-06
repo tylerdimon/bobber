@@ -11,7 +11,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--black);
     background-color: var(--bg-color);
-    max-width: 1200px;
+    max-width: 800px;
     margin: auto;
 }
 
