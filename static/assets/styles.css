@@ -24,6 +24,10 @@ h1 {
     color: var(--orange);
 }
 
+h2 {
+    margin: 0;
+}
+
 nav {
     display: flex;
     gap: var(--space);

@@ -1,9 +1,11 @@
 {{define "content"}}
-<h2>Namespaces</h2>
-<a href="/namespace">Add</a>
-<ul id="namespaces">
+<div class="flex">
+    <h2>Namespaces</h2>
+    <a href="/namespace">Add</a>
+</div>
+<div id="namespaces" class="stack">
     {{range .Data}}
-        <li>
+        <div class="box">
             {{.Name}} |
             <a href="#">View Requests</a> |
             <a href="/namespace/{{.ID}}">Edit</a> |
@@ -11,7 +13,7 @@
                onclick="return confirm('Are you sure you want to delete this namespace and all endpoints?');">
                 Delete
             </a>
-        </li>
+        </div>
     {{end}}
-</ul>
+</div>
 {{end}}
