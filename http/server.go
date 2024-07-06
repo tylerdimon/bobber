@@ -19,6 +19,13 @@ type Server struct {
 	EndpointService  bobber.EndpointService
 }
 
+func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {
+	err := static.NotFoundTemplate.Execute(w, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (s *Server) serveHTTP(w http.ResponseWriter, r *http.Request) {
 	// Override method for forms passing "_method" value.
 	if r.Method == http.MethodPost {
@@ -40,8 +47,7 @@ func (s *Server) Init() {
 	//This includes changing route paths for JSON endpoints & overridding methods.
 	s.server.Handler = http.HandlerFunc(s.serveHTTP)
 
-	// Setup error handling routes.
-	//s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
+	s.router.NotFoundHandler = http.HandlerFunc(s.handleNotFound)
 
 	staticFilesDebugMode := os.Getenv("DEBUG")
 	if staticFilesDebugMode == "True" {

@@ -22,8 +22,9 @@ const singleRequestPath = "html/request-short.html"
 const requestDetailPath = "html/request-detail.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
-const endpointAddPath = "html/endpoint-detail.html"
+const endpointDetailPath = "html/endpoint-detail.html"
 const actionButtonPath = "html/components/action-button.html"
+const notFoundPath = "html/not-found.html"
 
 type Executable interface {
 	Execute(io.Writer, any) error
@@ -35,7 +36,8 @@ var ConfigTemplate Executable
 var RequestTemplate Executable
 var RequestDetailTemplate Executable
 var NamespaceAddTemplate Executable
-var EndpointAddTemplate Executable
+var EndpointDetailTemplate Executable
+var NotFoundTemplate Executable
 
 type Reloader struct {
 	templateGenerator func() *template.Template
@@ -74,10 +76,16 @@ func ParseHTML() {
 		log.Fatal(err)
 	}
 
-	EndpointAddTemplate, err = template.ParseFS(html, baseTemplatePath, endpointAddPath)
+	EndpointDetailTemplate, err = template.ParseFS(html, baseTemplatePath, endpointDetailPath)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	NotFoundTemplate, err = template.ParseFS(html, baseTemplatePath, notFoundPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 // GetRequestHTML used to generate HTML pushed over websocket

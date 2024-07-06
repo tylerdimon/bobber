@@ -47,7 +47,7 @@ func (h *EndpointHandler) detail(w http.ResponseWriter, r *http.Request) {
 			Endpoint:    endpoint,
 		}
 
-		err = static.EndpointAddTemplate.Execute(w, pageData)
+		err = static.EndpointDetailTemplate.Execute(w, pageData)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
