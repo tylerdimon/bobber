@@ -2,6 +2,9 @@
 <h2>{{.Title}}</h2>
 
 {{if .Namespace}}
+
+<a href="/request?namespaceId={{.Namespace.ID}}">View Requests</a>
+
 <form action="/namespace/{{.Namespace.ID}}" method="post" class="stack">
     <input type="hidden" name="_method" value="PUT" />
 
@@ -44,7 +47,7 @@
     {{range .Endpoints}}
     <li>
         {{.Method}} {{.Path}} |
-        <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}/requests">Incoming Requests</a> |
+        <a href="/request?endpointId={{.ID}}">View Requests</a> |
         <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}">Edit</a> |
         <a href="/namespace/{{$namespaceId}}/endpoint/{{.ID}}/delete">Delete</a>
     </li>

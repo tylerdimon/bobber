@@ -2,6 +2,9 @@
 
 {{if .Endpoint}}
 <h2>Update Endpoint</h2>
+
+<a href="/request?endpointId={{.Endpoint.ID}}">View Requests</a>
+
 <form action="/namespace/{{.NamespaceID}}/endpoint/{{.Endpoint.ID}}" method="post" class="stack">
     <input type="hidden" name="_method" value="PUT" />
 
