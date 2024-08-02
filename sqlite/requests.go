@@ -73,6 +73,76 @@ WHERE r.id = ?;`
 	return r, nil
 }
 
+func (s *RequestService) GetByNamespace(namespaceId string) ([]*bobber.Request, error) {
+	query := `
+SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, e.name, r.response
+FROM requests r
+LEFT JOIN namespaces n on r.namespace_id = n.id
+LEFT JOIN endpoints e on r.endpoint_id = e.id
+WHERE r.namespace_id = ?
+ORDER BY r.timestamp DESC;`
+
+	rows, err := s.DB.conn.Query(query, namespaceId)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []*bobber.Request
+	for rows.Next() {
+		r, err := scan(rows)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		requests = append(requests, r)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return requests, nil
+}
+
+func (s *RequestService) GetByEndpoint(endpointId string) ([]*bobber.Request, error) {
+	query := `
+SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,
+	   r.headers, r.namespace_id, r.endpoint_id, n.name, e.name, r.response
+FROM requests r
+LEFT JOIN namespaces n on r.namespace_id = n.id
+LEFT JOIN endpoints e on r.endpoint_id = e.id
+WHERE r.endpoint_id = ?
+ORDER BY r.timestamp DESC;`
+
+	rows, err := s.DB.conn.Query(query, endpointId)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []*bobber.Request
+	for rows.Next() {
+		r, err := scan(rows)
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
+		requests = append(requests, r)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return requests, nil
+}
+
 func (s *RequestService) GetAll() ([]*bobber.Request, error) {
 	query := `
 SELECT r.id, r.method, r.host, r.path, r.timestamp, r.body,

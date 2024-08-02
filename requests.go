@@ -26,6 +26,8 @@ type Header struct {
 
 type RequestService interface {
 	GetById(id string) (*Request, error)
+	GetByNamespace(namespaceId string) ([]*Request, error)
+	GetByEndpoint(endpointId string) ([]*Request, error)
 	GetAll() ([]*Request, error)
 	Add(request Request) (*Request, error)
 	DeleteById(id string) (*Request, error)

@@ -73,7 +73,25 @@ func (h *RequestHandler) RecordRequestHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Request) {
-	requests, err := h.RequestService.GetAll()
+	queryParams := r.URL.Query()
+	endpointId := queryParams.Get("endpointId")
+	namespaceId := queryParams.Get("namespaceId")
+
+	var title string
+	var requests []*bobber.Request
+	var err error
+
+	if endpointId != "" {
+		title = fmt.Sprintf("Endpoint %s Requests", endpointId)
+		requests, err = h.RequestService.GetByEndpoint(endpointId)
+	} else if namespaceId != "" {
+		title = fmt.Sprintf("Endpoint %s Requests", namespaceId)
+		requests, err = h.RequestService.GetByNamespace(namespaceId)
+	} else {
+		title = "All Requests"
+		requests, err = h.RequestService.GetAll()
+	}
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -83,7 +101,7 @@ func (h *RequestHandler) RequestIndexHandler(w http.ResponseWriter, r *http.Requ
 		Title string
 		Data  any
 	}{
-		Title: "Requests",
+		Title: title,
 		Data:  requests,
 	}
 
