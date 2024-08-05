@@ -75,6 +75,9 @@ func (s *Server) Init() {
 	requestHandler.WebsocketService = s.WebsocketService
 	requestHandler.RegisterRequestRoutes(s.router)
 
+	extractorHandler := &ExtractorHandler{}
+	extractorHandler.Register(s.router)
+
 	websocketHandler := WebsocketHandler{}
 	websocketHandler.WebsocketService = s.WebsocketService
 	websocketHandler.RegisterWebsocketRoutes(s.router)

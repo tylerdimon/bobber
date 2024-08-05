@@ -1,0 +1,36 @@
+{{define "content"}}
+
+<h2>Add Extractor</h2>
+
+<form action="/extractors" method="post" class="stack">
+    <div class="form-element">
+        <label for="path">Path:</label>
+        <input type="text" id="path" name="path" value="" required>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+
+
+<h3>Reponse Cases</h3>
+
+<form action="/extractors" method="post" class="stack">
+    <div class="form-element">
+        <label for="value">Value:</label>
+        <input type="text" id="value" name="value" value="" required>
+    </div>
+
+    <div class="form-element-textarea">
+        <label for="response">Response:</label><br>
+        <textarea id="response" name="response" rows="10" cols="50" required>{{.Endpoint.Response}}</textarea>
+    </div>
+
+    <input type="submit" value="Submit">
+</form>
+
+<ul>
+    <li>Value: 123 | <a href="#">View Response</a></li>
+    <li>Value: 555 | <a href="#">View Response</a></li>
+</ul>
+
+{{end}}

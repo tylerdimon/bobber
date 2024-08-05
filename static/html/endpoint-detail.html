@@ -38,6 +38,16 @@
 
     <input type="submit" value="Submit">
 </form>
+
+<h3>Response Cases</h3>
+
+<a href="#">Update Priority</a>
+<ul>
+    <li>Extractor : user.id | Value: 123 | <a href="#">View Response</a></li>
+    <li>Extractor : user.id | Value: 555 | <a href="#">View Response</a></li>
+    <li>Extractor : user.name | Value: Bob | <a href="#">View Response</a></li>
+</ul>
+
 {{else}}
 <h2>Add Endpoint</h2>
 <form action="/namespace/{{.NamespaceID}}/endpoint" method="post" class="stack">

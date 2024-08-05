@@ -23,6 +23,7 @@ const requestDetailPath = "html/request-detail.html"
 const configPath = "html/namespace-index.html"
 const namespaceAddPath = "html/namespace-detail.html"
 const endpointDetailPath = "html/endpoint-detail.html"
+const extractorDetailPath = "html/extractor-detail.html"
 const actionButtonPath = "html/components/action-button.html"
 const notFoundPath = "html/not-found.html"
 
@@ -37,6 +38,7 @@ var RequestTemplate Executable
 var RequestDetailTemplate Executable
 var NamespaceAddTemplate Executable
 var EndpointDetailTemplate Executable
+var ExtractorDetailTemplate Executable
 var NotFoundTemplate Executable
 
 type Reloader struct {
@@ -77,6 +79,11 @@ func ParseHTML() {
 	}
 
 	EndpointDetailTemplate, err = template.ParseFS(html, baseTemplatePath, endpointDetailPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ExtractorDetailTemplate, err = template.ParseFS(html, baseTemplatePath, extractorDetailPath)
 	if err != nil {
 		log.Fatal(err)
 	}
