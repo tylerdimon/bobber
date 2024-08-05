@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS extracted (
     extractor_id TEXT,
     request_id TEXT,
     FOREIGN KEY (extractor_id) REFERENCES extractors(id),
-    FOREIGN KEY (request_id) REFERENCES requests(id)
+    FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
 );
