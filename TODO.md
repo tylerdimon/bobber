@@ -1,4 +1,35 @@
 ## TODO
+tests
+links -> underline on hover and switch cursor
+
+
+change font of "logo"
+better form inputs
+
+submit button
+delete button
+other?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ------------------

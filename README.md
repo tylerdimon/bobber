@@ -1,4 +1,4 @@
-# Bobber
+./b# Bobber
 
 Bobber is a tool for mocking out APIs your application integrates with using HTTP request. 
 It replaces real APIs in a way that lets your application keep working while making development easier.
@@ -15,6 +15,10 @@ go build ./cmd/bobber
 ./bobber
 ```
 
+or with live reload
+```
+modd
+```
 UI runs on `localhost:8000` by default
 
 Listening for requests at `locahost:8000/requests/`

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>bobber</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<header class="header">
+    <div class="header-content responsive-wrapper">
+        <div class="header-logo">
+            <a href="#" id="logo">
+                <h1>bobber</h1>
+            </a>
+        </div>
+        <div class="header-navigation">
+            <nav class="header-navigation-links">
+                <a href="#"> Requests </a>
+                <a href="#"> Namespaces </a>
+                <a href="#"> Endpoints </a>
+            </nav>
+            <div class="header-navigation-actions">
+                <a href="#" class="button"><span class="material-icons">settings</span></a>
+                <a href="#" class="button"><span class="material-icons">login</span></a>
+            </div>
+        </div>
+        <a href="#" class="button">
+            <i class="ph-list-bold"></i>
+            <span>Menu</span>
+        </a>
+    </div>
+</header>
+
+<main class="main">
+    <div class="responsive-wrapper">
+        <div class="content-header">
+            <div class="content-header-intro">
+                <h2>Namespace - Users</h2>
+            </div>
+            <div class="content-header-actions">
+                <a href="#" class="button">
+                    <span>Edit</span>
+                </a>
+                <a href="#" class="button">
+                    <span>Add Endpoint</span>
+                </a>
+            </div>
+        </div>
+        <div class="content content-border">
+            <div class="content-panel">
+                <h3>Endpoints</h3>
+                <div class="vertical-tabs">
+                    <a href="#">
+                        <div class="flex-space">
+                            <div>
+                                <div>
+                                    <b>GET /users</b><br>
+                                    <small>Get all</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#">
+                        <div class="flex-space">
+                            <div>
+                                <div>
+                                    <b>GET /users/{id}</b><br>
+                                    <small>Get by id</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#">
+                        <div class="flex-space">
+                            <div>
+                                <div>
+                                    <b>POST /users</b><br>
+                                    <small>Add</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#">
+                        <div class="flex-space">
+                            <div>
+                                <div>
+                                    <b>DELETE /users/{id}</b><br>
+                                    <small>Delete</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="content-main">
+                <div class="cards">
+
+                    <article class="card">
+                        <div class="card-header">
+                            <div>
+                                <h2>Add Endpoint</h2>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <form action="/namespace/{{.NamespaceID}}/endpoint" method="post">
+                                <div>
+                                    <label for="name">Name</label>
+                                    <input class="input"  type="text" id="name" name="name" required>
+                                </div>
+
+                                <div>
+                                    <label for="method">Method:</label>
+                                    <select class="input"  id="method" name="method" required>
+                                        <option>GET</option>
+                                        <option>POST</option>
+                                        <option>PUT</option>
+                                        <option>PATCH</option>
+                                        <option>DELETE</option>
+                                        <option>HEAD</option>
+                                        <option>*</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="path">Path:</label>
+                                    <input class="input" type="text" id="path" name="path" placeholder="/users" required>
+                                </div>
+
+                                <div>
+                                    <label for="response">Response:</label><br>
+                                    <textarea class="input"  id="response" name="response" rows="10" cols="50" required></textarea>
+                                </div>
+
+                                <div class="flex-end">
+                                    <input type="submit" value="Submit" class="button button-primary">
+                                    <input type="submit" value="Cancel" class="button">
+                                </div>
+                            </form>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

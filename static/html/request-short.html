@@ -1,31 +1,31 @@
 {{define "request"}}
 <div class="box">
     <div class="flex-space">
-        <div class="flex">
-            <div>
+        <div>
+            <div class="flex">
                 <b>{{.Method}} {{.Path}}</b>
-            </div>
-            {{if .NamespaceName}}
-                <div>
-                    <b>Namespace:</b> <a href="/namespace/{{.NamespaceID}}">{{.NamespaceName}}</a>
-                </div>
-            {{end}}
-            {{if .EndpointName}}
-                <div>
-                    <b>Endpoint:</b> <a href="/namespace/{{.NamespaceID}}//endpoint/{{.EndpointID}}">{{.EndpointName}}</a>
-                </div>
-            {{end}}
-            <div>
                 <small>{{dateInZone "01-02-2006 3:04:05PM MST" (.Timestamp) "UTC"}}</small>
             </div>
+            <div class="flex">
+                {{if .NamespaceName}}
+                <div>
+                    <b>Namespace</b> <a href="/namespace/{{.NamespaceID}}">{{.NamespaceName}}</a>
+                </div>
+                {{end}}
+                {{if .EndpointName}}
+                <div>
+                    <b>Endpoint</b> <a href="/namespace/{{.NamespaceID}}//endpoint/{{.EndpointID}}">{{.EndpointName}}</a>
+                </div>
+                {{end}}
+            </div>
         </div>
-        <div class="flex">
-            <a href="/request/{{.ID}}">Details</a>
-            {{template "action-button" (dict "Action" (printf "/request/%s" .ID) "Method" "DELETE" "ButtonText" "Delete")}}
-        </div>
+        <span class="material-icons">close</span>
     </div>
     <div>
-        {{ .Response }}
+        <b>Response</b>
+        <span class="material-icons">
+            arrow_drop_down
+        </span>
     </div>
 </div>
 {{end}}

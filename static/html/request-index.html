@@ -1,7 +1,147 @@
 {{define "content"}}
 
-<h2>All Requests</h2>
-{{template "action-button" (dict "Action" "/request" "Method" "DELETE" "ButtonText" "Delete All Requests")}}
+
+<div class="responsive-wrapper">
+    <div class="content">
+        <div class="content-panel">
+            <h3>Requests</h3>
+            <div class="vertical-tabs">
+                <a href="#">
+                    <div class="flex-space">
+                        <div>
+                            <div>
+                                <b>GET /users/11</b><br>
+                                <small>2024/01/01 3:15:05PM</small>
+                            </div>
+                        </div>
+                        <span class="material-icons close">close</span>
+                    </div>
+                </a>
+                <a href="#" class="active">
+                    <div class="flex-space">
+                        <div>
+                            <div>
+                                <b>POST /users</b><br>
+                                <small>2024/01/01 3:14:05PM</small>
+                            </div>
+                        </div>
+                        <span class="material-icons close">close</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="content-main">
+            <div class="flex-end">
+                <a href="#" class="button">Namespace</a>
+                <a href="#" class="button">Endpoint</a>
+            </div>
+
+            <div class="flex">
+                <article class="card">
+                    <div class="card-header">
+                        <h2>Request</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="flex">
+                            <table class="htable">
+                                <tr>
+                                    <td>Time</td>
+                                    <td>2024/01/01 3:04:05PM</td>
+                                </tr>
+                                <tr>
+                                    <td>Method</td>
+                                    <td>POST</td>
+                                </tr>
+                                <tr>
+                                    <td>Host</td>
+                                    <td>https://bobber.com</td>
+                                </tr>
+                                <tr>
+                                    <td>Path</td>
+                                    <td>/users</td>
+                                </tr>
+                            </table>
+
+                            <div>
+                                <h3>Headers</h3>
+                                <table class="htable">
+                                    <tr>
+                                        <td>content-type</td>
+                                        <td>application/json</td>
+                                    </tr>
+                                    <tr>
+                                        <td>content-length</td>
+                                        <td>55</td>
+                                    </tr>
+                                    <tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer">
+                        <h3>Body</h3>
+                        <pre><code>{
+    "firstName": "John",
+    "firstName": "Doe",
+    "age": "50",
+    "email": "john.doe@email.com"
+    "address" {
+        "street": "100 Oak Tree Ln"
+        "city": "Dallas"
+        "state": "TX"
+    }
+}</code></pre>
+                    </div>
+
+                </article>
+                <article class="card">
+                    <div class="card-header flex-space">
+                        <h2>Response</h2>
+                        <span>Status 200</span>
+                    </div>
+
+                    <div class="card-body">
+                        <h3>Headers</h3>
+                        <table class="htable">
+                            <tr>
+                                <td>content-type</td>
+                                <td>application/json</td>
+                            </tr>
+                            <tr>
+                                <td>content-length</td>
+                                <td>55</td>
+                            </tr>
+                            <tr>
+                        </table>
+                    </div>
+
+                    <div class="card-footer">
+                        <h3>Body</h3>
+                        <pre><code>{
+    "success": true,
+    "msg": "User John Doe registered in TX",
+    "data": { "id": 11 }
+}</code></pre>
+                    </div>
+
+                </article>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="flex-space">
+    <h2>All Requests</h2>
+    {{template "action-button" (dict "Action" "/request" "Method" "DELETE" "ButtonText" "Clear Requests")}}
+</div>
 <div id="requestList" class="stack">
     {{range .Data}}
         {{template "request" .}}
